@@ -11,6 +11,8 @@ import ReactFlow, {
   Node,
   NodeProps,
   useReactFlow,
+  Handle,
+  Position,
 } from 'reactflow';
 import styled from 'styled-components';
 import 'reactflow/dist/style.css';
@@ -154,6 +156,71 @@ function ZoneNode({ data }: NodeProps) {
   );
 }
 
+// Custom node for SingleEncounterDocument components
+const EncounterNodeContainer = styled.div`
+  background: transparent;
+  border-radius: 8px;
+  overflow: visible;
+  pointer-events: auto;
+  position: relative;
+  width: fit-content;
+  
+  .react-flow__handle {
+    width: 12px;
+    height: 12px;
+    background: #3b82f6;
+    border: 2px solid white;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  
+  &:hover .react-flow__handle {
+    opacity: 1;
+  }
+`;
+
+function SingleEncounterNode({ data }: NodeProps) {
+  // Determine if this is the first or last encounter based on the item ID
+  const itemId = data.item?.id || '';
+  const isFirstEncounter = itemId.includes('single-encounter-1');
+  const isLastEncounter = itemId.includes('single-encounter-6');
+  
+  return (
+    <EncounterNodeContainer>
+      {/* Connection handles for linking encounters */}
+      {/* Only show left handle if NOT the first encounter */}
+      {!isFirstEncounter && (
+        <Handle 
+          type="target" 
+          position={Position.Left} 
+          id="left"
+          style={{ left: -6 }}
+        />
+      )}
+      {/* Only show right handle if NOT the last encounter */}
+      {!isLastEncounter && (
+        <Handle 
+          type="source" 
+          position={Position.Right} 
+          id="right"
+          style={{ right: -6 }}
+        />
+      )}
+      
+      <NodeWrapper>
+        <BoardItem
+          item={data.item}
+          isSelected={data.isSelected || false}
+          onUpdate={data.onUpdate}
+          onDelete={data.onDelete}
+          onSelect={data.onSelect}
+          zoom={1}
+        />
+      </NodeWrapper>
+    </EncounterNodeContainer>
+  );
+}
+
 function Canvas2() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -292,6 +359,7 @@ function Canvas2() {
     boardItem: CustomBoardNode,
     zone: ZoneNode,
     triageFlow: TriageFlowNode,
+    singleEncounter: SingleEncounterNode,
   }), []);
 
   // Load items from backend on mount
@@ -332,8 +400,13 @@ function Canvas2() {
 
         // Create item nodes
         const itemNodes: Node[] = allItems.map((item: any) => {
-          // Determine node type based on item type
-          const nodeType = item.type === 'triageFlow' ? 'triageFlow' : 'boardItem';
+          // Determine node type based on item type and componentType
+          let nodeType = 'boardItem';
+          if (item.type === 'triageFlow') {
+            nodeType = 'triageFlow';
+          } else if (item.componentType === 'SingleEncounterDocument') {
+            nodeType = 'singleEncounter';
+          }
           
           // For triageFlow nodes, use item.data directly
           const nodeData = item.type === 'triageFlow' 
@@ -352,8 +425,8 @@ function Canvas2() {
             position: { x: item.x, y: item.y },
             data: nodeData,
             draggable: item.draggable !== false,
-            selectable: item.selectable !== false && item.type !== 'triageFlow',
-            zIndex: 1,
+            selectable: item.selectable !== false && item.type !== 'triageFlow' && item.componentType !== 'SingleEncounterDocument',
+            zIndex: nodeType === 'singleEncounter' ? 2 : 1,
           };
         });
 
@@ -404,8 +477,62 @@ function Canvas2() {
             style: { stroke: '#26a69a', strokeWidth: 2 },
           },
         ];
+
+        // Create edges for encounter document connections (1→2→3→4→5→6)
+        const encounterEdges: Edge[] = [
+          {
+            id: 'edge-encounter-1-2',
+            source: 'dashboard-item-1759906300003-single-encounter-1',
+            sourceHandle: 'right',
+            target: 'dashboard-item-1759906300004-single-encounter-2',
+            targetHandle: 'left',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#3b82f6', strokeWidth: 3 },
+          },
+          {
+            id: 'edge-encounter-2-3',
+            source: 'dashboard-item-1759906300004-single-encounter-2',
+            sourceHandle: 'right',
+            target: 'dashboard-item-1759906300004-single-encounter-3',
+            targetHandle: 'left',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#8b5cf6', strokeWidth: 3 },
+          },
+          {
+            id: 'edge-encounter-3-4',
+            source: 'dashboard-item-1759906300004-single-encounter-3',
+            sourceHandle: 'right',
+            target: 'dashboard-item-1759906300004-single-encounter-4',
+            targetHandle: 'left',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#10b981', strokeWidth: 3 },
+          },
+          {
+            id: 'edge-encounter-4-5',
+            source: 'dashboard-item-1759906300004-single-encounter-4',
+            sourceHandle: 'right',
+            target: 'dashboard-item-1759906300004-single-encounter-5',
+            targetHandle: 'left',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#f59e0b', strokeWidth: 3 },
+          },
+          {
+            id: 'edge-encounter-5-6',
+            source: 'dashboard-item-1759906300004-single-encounter-5',
+            sourceHandle: 'right',
+            target: 'dashboard-item-1759906300004-single-encounter-6',
+            targetHandle: 'left',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#ef4444', strokeWidth: 3 },
+          },
+        ];
         
-        setEdges(triageEdges);
+        setEdges([...triageEdges, ...encounterEdges]);
       } catch (error) {
         console.error('❌ Error loading items:', error);
       }
