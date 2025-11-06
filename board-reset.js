@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const BASE_URL = "https://boardv26.vercel.app";
+const BASE_URL = "https://boardv27.vercel.app";
 
 export async function POST() {
   try {
