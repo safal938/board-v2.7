@@ -369,27 +369,28 @@ const toHtml = (md: string) => {
   return html;
 };
 
-const DeleteButton = styled.button`
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: none;
-  background: #f44336;
-  color: white;
-  font-size: 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-
-  &:hover {
-    background: #d32f2f;
-  }
-`;
+// DeleteButton removed - delete functionality disabled
+// const DeleteButton = styled.button`
+//   position: absolute;
+//   top: -8px;
+//   right: -8px;
+//   width: 20px;
+//   height: 20px;
+//   border-radius: 50%;
+//   border: none;
+//   background: #f44336;
+//   color: white;
+//   font-size: 12px;
+//   cursor: pointer;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   z-index: 10;
+//
+//   &:hover {
+//     background: #d32f2f;
+//   }
+// `;
 
 // BoardItemProps interface removed for Storybook compatibility
 
@@ -1196,17 +1197,6 @@ const BoardItem = ({ item, isSelected, onUpdate, onDelete, onSelect, zoom = 1 })
       whileTap={isDragging || item.type === "button" ? {} : { scale: 0.98 }}
     >
       {renderContent()}
-      {isSelected && item.type !== "button" && (
-        <DeleteButton
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete(item.id);
-          }}
-          title="Delete item"
-        >
-          ×
-        </DeleteButton>
-      )}
       
       {/* Alert Modal */}
       <AlertModal
