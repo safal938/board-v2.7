@@ -11,14 +11,17 @@ import ReactFlow, {
   Node,
   NodeProps,
   useReactFlow,
+  Handle,
+  Position,
 } from 'reactflow';
 import styled from 'styled-components';
 import 'reactflow/dist/style.css';
-import { FileText, Image as ImageIcon, X, Plus, Mic, MicOff } from 'lucide-react';
+import { FileText, Image as ImageIcon, X, Plus, Mic, MicOff, Layers, Zap, Activity, Database, AlertTriangle, GitMerge } from 'lucide-react';
 import zoneConfig from '../data/zone-config.json';
 import boardItemsData from '../data/boardItems.json';
 import BoardItem from './BoardItem';
 import TriageFlowNode from './TriageFlowNode';
+import EHRHubNode from './EHRHubNode';
 import AlertModal from './AlertModal';
 
 interface ZoneContainerProps {
@@ -28,30 +31,31 @@ interface ZoneContainerProps {
 
 const ZoneContainer = styled.div<ZoneContainerProps>`
   position: absolute;
-  border: ${zoneConfig.settings.borderWidth}px solid ${props => props.color};
-  border-radius: ${zoneConfig.settings.borderRadius}px;
-  background: ${props => props.gradient || props.color};
-  box-shadow: ${zoneConfig.settings.boxShadow};
+  border: 2px solid rgba(2, 136, 209, 0.3);
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(227, 242, 253, 0.6) 0%, rgba(225, 245, 254, 0.6) 100%);
   pointer-events: none;
   z-index: 1;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(2, 136, 209, 0.1);
 `;
 
 const ZoneLabel = styled.div`
   position: absolute;
-  top: 8px;
-  left: 8px;
-  background: ${zoneConfig.settings.labelBackgroundColor};
-  padding: ${zoneConfig.settings.labelPadding};
-  border-radius: 8px;
-  font-size: ${zoneConfig.settings.labelFontSize}px;
-  font-weight: ${zoneConfig.settings.labelFontWeight};
-  color: ${zoneConfig.settings.labelTextColor};
+  top: 16px;
+  left: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0288d1;
   pointer-events: none;
   z-index: 2;
   backdrop-filter: blur(10px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(2, 136, 209, 0.15);
+  border: 2px solid rgba(2, 136, 209, 0.2);
+  letter-spacing: 0.02em;
 `;
 
 const ZonesLayer = styled.div`
@@ -64,21 +68,192 @@ const ZonesLayer = styled.div`
   z-index: 0;
 `;
 
+const AppContainer = styled.div`
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+`;
+
+const AppHeader = styled.header`
+  height: 64px;
+  background: linear-gradient(135deg, #0288d1 0%, #03a9f4 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  z-index: 1000;
+  box-shadow: 0 2px 12px rgba(2, 136, 209, 0.2);
+`;
+
+const HeaderLeft = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 32px;
+`;
+
+const Logo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.02em;
+  
+  svg {
+    color: #e3f2fd;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  }
+`;
+
+const HeaderNav = styled.nav`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+`;
+
+const NavButton = styled.button<{ active?: boolean }>`
+  padding: 10px 18px;
+  border: none;
+  background: ${props => props.active ? 'rgba(255, 255, 255, 0.2)' : 'transparent'};
+  color: ${props => props.active ? 'white' : 'rgba(255, 255, 255, 0.85)'};
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+  }
+`;
+
+const HeaderRight = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+`;
+
+const StatusBadge = styled.div<{ status: 'online' | 'offline' }>`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: ${props => props.status === 'online' ? 'rgba(255, 255, 255, 0.25)' : 'rgba(239, 68, 68, 0.2)'};
+  color: white;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  &::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: ${props => props.status === 'online' ? '#4ade80' : '#ef4444'};
+    box-shadow: 0 0 8px ${props => props.status === 'online' ? '#4ade80' : '#ef4444'};
+    animation: ${props => props.status === 'online' ? 'pulse 2s ease-in-out infinite' : 'none'};
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+`;
+
+const CanvasContainer = styled.div`
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #ffffff;
+`;
+
 const ReactFlowWrapper = styled.div`
   width: 100%;
   height: 100%;
+  background: #ffffff;
   
   /* Custom selection styling for nodes */
   .react-flow__node.selected {
     .react-flow__node-default,
     & > div {
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5), 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+      box-shadow: 0 0 0 3px rgba(2, 136, 209, 0.4), 0 8px 24px rgba(2, 136, 209, 0.15) !important;
     }
   }
   
   /* Remove default ReactFlow selection styling */
   .react-flow__node.selected .react-flow__handle {
-    background: #3b82f6;
+    background: #0288d1;
+  }
+  
+  /* ReactFlow controls styling */
+  .react-flow__controls {
+    box-shadow: 0 4px 16px rgba(2, 136, 209, 0.12);
+    border: 1px solid rgba(2, 136, 209, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+  }
+  
+  .react-flow__controls-button {
+    background: white;
+    border-bottom: 1px solid rgba(2, 136, 209, 0.08);
+    
+    &:hover {
+      background: #e3f2fd;
+    }
+    
+    svg {
+      fill: #0288d1;
+    }
+  }
+`;
+
+const FloatingToolbar = styled.div`
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border: 1px solid rgba(2, 136, 209, 0.15);
+  border-radius: 14px;
+  padding: 10px;
+  display: flex;
+  gap: 6px;
+  box-shadow: 0 8px 24px rgba(2, 136, 209, 0.15);
+  z-index: 100;
+`;
+
+const ToolbarButton = styled.button<{ active?: boolean }>`
+  padding: 10px 16px;
+  border: none;
+  background: ${props => props.active ? 'linear-gradient(135deg, #0288d1 0%, #03a9f4 100%)' : 'transparent'};
+  color: ${props => props.active ? 'white' : '#0288d1'};
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  &:hover {
+    background: ${props => props.active ? 'linear-gradient(135deg, #0288d1 0%, #03a9f4 100%)' : '#e3f2fd'};
+    color: ${props => props.active ? 'white' : '#01579b'};
+    transform: translateY(-1px);
+  }
+  
+  svg {
+    width: 16px;
+    height: 16px;
   }
 `;
 
@@ -96,6 +271,132 @@ const NodeWrapper = styled.div`
     transform: none !important;
   }
 `;
+
+// Custom node component for consolidator and other custom nodes
+const CustomNodeContainer = styled.div<{ color?: string }>`
+  padding: 64px 80px;
+  border-radius: 40px;
+  background: white;
+  border: 8px solid ${props => props.color || '#e5e7eb'};
+  min-width: 700px;
+  box-shadow: 0 16px 64px ${props => props.color ? `${props.color}40` : 'rgba(0, 0, 0, 0.15)'};
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  
+  &:hover {
+    box-shadow: 0 24px 80px ${props => props.color ? `${props.color}60` : 'rgba(0, 0, 0, 0.2)'};
+    transform: translateY(-4px) scale(1.02);
+  }
+`;
+
+const CustomNodeIconContainer = styled.div<{ color?: string }>`
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: ${props => props.color || '#e5e7eb'};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px ${props => props.color ? `${props.color}60` : 'rgba(0, 0, 0, 0.1)'};
+  animation: pulse 2s ease-in-out infinite;
+  
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 8px 32px ${props => props.color ? `${props.color}60` : 'rgba(0, 0, 0, 0.1)'};
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 12px 48px ${props => props.color ? `${props.color}80` : 'rgba(0, 0, 0, 0.15)'};
+    }
+  }
+`;
+
+const CustomNodeTitle = styled.div`
+  font-weight: 700;
+  font-size: 40px;
+  color: #1f2937;
+  text-align: center;
+  line-height: 1.3;
+`;
+
+const CustomNodeContent = styled.div`
+  font-size: 28px;
+  color: #6b7280;
+  line-height: 1.5;
+  text-align: center;
+  max-width: 600px;
+`;
+
+const CustomNodeBadge = styled.div<{ color?: string }>`
+  padding: 12px 32px;
+  border-radius: 40px;
+  background: ${props => props.color ? `${props.color}20` : '#f3f4f6'};
+  color: ${props => props.color || '#6b7280'};
+  font-size: 24px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
+function CustomNode({ data }: NodeProps) {
+  const getIcon = () => {
+    switch (data.icon) {
+      case 'database':
+        return <GitMerge size={80} color="white" strokeWidth={3} />;
+      case 'activity':
+        return <AlertTriangle size={80} color="white" strokeWidth={3} />;
+      case 'merge':
+        return <GitMerge size={80} color="white" strokeWidth={3} />;
+      case 'alert':
+        return <AlertTriangle size={80} color="white" strokeWidth={3} />;
+      default:
+        return <Layers size={80} color="white" strokeWidth={3} />;
+    }
+  };
+
+  return (
+    <CustomNodeContainer color={data.color}>
+      <Handle 
+        type="target" 
+        position={Position.Top}
+        style={{
+          background: data.color || '#e5e7eb',
+          width: 32,
+          height: 32,
+          border: '6px solid white',
+        }}
+      />
+      <Handle 
+        type="source" 
+        position={Position.Bottom}
+        style={{
+          background: data.color || '#e5e7eb',
+          width: 32,
+          height: 32,
+          border: '6px solid white',
+        }}
+      />
+      
+      <CustomNodeIconContainer color={data.color}>
+        {getIcon()}
+      </CustomNodeIconContainer>
+      
+      <CustomNodeTitle>
+        {data.label}
+      </CustomNodeTitle>
+      
+      {data.content && <CustomNodeContent>{data.content}</CustomNodeContent>}
+      
+      <CustomNodeBadge color={data.color}>
+        {data.badge || 'Processing'}
+      </CustomNodeBadge>
+    </CustomNodeContainer>
+  );
+}
 
 // Custom node component that renders board items using the actual BoardItem component
 function CustomBoardNode({ data }: NodeProps) {
@@ -117,40 +418,183 @@ function CustomBoardNode({ data }: NodeProps) {
 
 // Custom zone node component
 function ZoneNode({ data }: NodeProps) {
-  const zone = data.zone;
+  const zone = data.zone || data;
+  const handlePosition = data.handlePosition || zone.handlePosition;
+  
+  // Use fixed blue color scheme for all zones
+  const borderColor = '#2196F3';
+  const chipColor = '#2196F3';
+  
+  // Support multiple handle positions (can be 'top', 'bottom', 'both', 'right', 'left', or comma-separated like 'bottom,right')
+  const positions = typeof handlePosition === 'string' ? handlePosition.split(',').map(p => p.trim()) : [];
+  const hasTopHandle = positions.includes('top') || positions.includes('both');
+  const hasBottomHandle = positions.includes('bottom') || positions.includes('both');
+  const hasRightHandle = positions.includes('right');
+  const hasLeftHandle = positions.includes('left');
   
   return (
     <div
       style={{
         width: zone.width,
         height: zone.height,
-        border: `${zoneConfig.settings.borderWidth}px solid ${zone.color}`,
-        borderRadius: `${zoneConfig.settings.borderRadius}px`,
-        background: zone.gradient || zone.color,
-        boxShadow: zoneConfig.settings.boxShadow,
+        border: `3px solid ${borderColor}`,
+        borderRadius: '20px',
+        background: data.style?.background || 'linear-gradient(135deg, rgba(227, 242, 253, 0.6) 0%, rgba(225, 245, 254, 0.6) 100%)',
         pointerEvents: 'none',
         position: 'relative',
+        boxShadow: '0 2px 8px rgba(33, 150, 243, 0.15)',
       }}
     >
+      {/* Add connection handles based on handlePosition */}
+      {hasTopHandle && (
+        <Handle 
+          type="target" 
+          position={Position.Top} 
+          id="top"
+          style={{ 
+            background: chipColor, 
+            width: 16, 
+            height: 16,
+            border: '3px solid white',
+            top: -8,
+            pointerEvents: 'all'
+          }} 
+        />
+      )}
+      
+      {hasBottomHandle && (
+        <Handle 
+          type="source" 
+          position={Position.Bottom} 
+          id="bottom"
+          style={{ 
+            background: chipColor, 
+            width: 16, 
+            height: 16,
+            border: '3px solid white',
+            bottom: -8,
+            pointerEvents: 'all'
+          }} 
+        />
+      )}
+      
+      {hasRightHandle && (
+        <Handle 
+          type="source" 
+          position={Position.Right} 
+          id="right"
+          style={{ 
+            background: chipColor, 
+            width: 16, 
+            height: 16,
+            border: '3px solid white',
+            right: -8,
+            pointerEvents: 'all'
+          }} 
+        />
+      )}
+      
+      {hasLeftHandle && (
+        <Handle 
+          type="target" 
+          position={Position.Left} 
+          id="left"
+          style={{ 
+            background: chipColor, 
+            width: 16, 
+            height: 16,
+            border: '3px solid white',
+            left: -8,
+            pointerEvents: 'all'
+          }} 
+        />
+      )}
+      
       <div
         style={{
           position: 'absolute',
-          top: '8px',
-          left: '8px',
-          background: zoneConfig.settings.labelBackgroundColor,
-          padding: zoneConfig.settings.labelPadding,
-          borderRadius: '8px',
-          fontSize: `${zoneConfig.settings.labelFontSize}px`,
-          fontWeight: zoneConfig.settings.labelFontWeight,
-          color: zoneConfig.settings.labelTextColor,
+          top: '16px',
+          left: '16px',
+          background: 'rgba(255, 255, 255, 0.95)',
+          padding: '10px 16px',
+          borderRadius: '10px',
+          fontSize: '13px',
+          fontWeight: 600,
+          color: chipColor,
           backdropFilter: 'blur(10px)',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
+          boxShadow: '0 2px 8px rgba(33, 150, 243, 0.15)',
+          border: `2px solid ${chipColor}`,
+          letterSpacing: '0.02em',
         }}
       >
-        {zone.label}
+        {zone.label || data.label}
       </div>
     </div>
+  );
+}
+
+// Custom node for SingleEncounterDocument components
+const EncounterNodeContainer = styled.div`
+  background: transparent;
+  border-radius: 8px;
+  overflow: visible;
+  pointer-events: auto;
+  position: relative;
+  width: fit-content;
+  
+  .react-flow__handle {
+    width: 12px;
+    height: 12px;
+    background: #3b82f6;
+    border: 2px solid white;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  
+  &:hover .react-flow__handle {
+    opacity: 1;
+  }
+`;
+
+function SingleEncounterNode({ data }: NodeProps) {
+  // Determine if this is the first or last encounter based on the item ID
+  const itemId = data.item?.id || '';
+  const isFirstEncounter = itemId.includes('single-encounter-1');
+  const isLastEncounter = itemId.includes('single-encounter-6');
+  
+  return (
+    <EncounterNodeContainer>
+      {/* Connection handles for linking encounters */}
+      {/* Only show left handle if NOT the first encounter */}
+      {!isFirstEncounter && (
+        <Handle 
+          type="target" 
+          position={Position.Left} 
+          id="left"
+          style={{ left: -6 }}
+        />
+      )}
+      {/* Only show right handle if NOT the last encounter */}
+      {!isLastEncounter && (
+        <Handle 
+          type="source" 
+          position={Position.Right} 
+          id="right"
+          style={{ right: -6 }}
+        />
+      )}
+      
+      <NodeWrapper>
+        <BoardItem
+          item={data.item}
+          isSelected={data.isSelected || false}
+          onUpdate={data.onUpdate}
+          onDelete={data.onDelete}
+          onSelect={data.onSelect}
+          zoom={1}
+        />
+      </NodeWrapper>
+    </EncounterNodeContainer>
   );
 }
 
@@ -274,8 +718,13 @@ function Canvas2() {
 
   // Handle ReactFlow node selection
   const onNodeClick = useCallback((_event: React.MouseEvent, node: Node) => {
-    // Only handle boardItem nodes, not zones
+    // Only handle boardItem nodes, not zones or subzones
     if (node.type === 'boardItem') {
+      // Don't select subzones
+      if (node.id?.includes('subzone-')) {
+        console.log('🖱️ Subzone clicked (ignoring):', node.id);
+        return;
+      }
       console.log('🖱️ Node clicked:', node.id);
       handleSelectItem(node.id);
     }
@@ -289,9 +738,12 @@ function Canvas2() {
 
   // Define custom node types
   const nodeTypes = useMemo(() => ({
+    custom: CustomNode,
     boardItem: CustomBoardNode,
     zone: ZoneNode,
     triageFlow: TriageFlowNode,
+    ehrHub: EHRHubNode,
+    singleEncounter: SingleEncounterNode,
   }), []);
 
   // Load items from backend on mount
@@ -332,12 +784,27 @@ function Canvas2() {
 
         // Create item nodes
         const itemNodes: Node[] = allItems.map((item: any) => {
-          // Determine node type based on item type
-          const nodeType = item.type === 'triageFlow' ? 'triageFlow' : 'boardItem';
+          // Determine node type based on item type and componentType
+          let nodeType = 'boardItem';
+          if (item.type === 'triageFlow') {
+            nodeType = 'triageFlow';
+          } else if (item.type === 'ehrHub') {
+            nodeType = 'ehrHub';
+          } else if (item.type === 'zone') {
+            nodeType = 'zone';
+          } else if (item.componentType === 'SingleEncounterDocument') {
+            nodeType = 'singleEncounter';
+          }
           
-          // For triageFlow nodes, use item.data directly
-          const nodeData = item.type === 'triageFlow' 
+          // Check if this is a raw data document or subzone
+          const isRawDataDocument = item.id?.includes('raw-') || item.componentType === 'RawClinicalNote' || item.componentType === 'ICELabData';
+          const isSubzone = item.id?.includes('subzone-') || item.type === 'zone';
+          
+          // For triageFlow, ehrHub, and zone nodes, use item.data directly (or item for zones)
+          const nodeData = (item.type === 'triageFlow' || item.type === 'ehrHub')
             ? item.data 
+            : item.type === 'zone'
+            ? { ...item.data, zone: { width: item.width, height: item.height, label: item.data?.label }, style: item.style }
             : { 
                 item: item,
                 isSelected: false,
@@ -351,19 +818,63 @@ function Canvas2() {
             type: nodeType,
             position: { x: item.x, y: item.y },
             data: nodeData,
-            draggable: item.draggable !== false,
-            selectable: item.selectable !== false && item.type !== 'triageFlow',
-            zIndex: 1,
+            draggable: item.draggable !== false && !isSubzone,
+            selectable: item.selectable !== false && item.type !== 'triageFlow' && item.componentType !== 'SingleEncounterDocument' && !isSubzone,
+            zIndex: isSubzone ? -2 : (isRawDataDocument ? 10 : (nodeType === 'singleEncounter' ? 2 : 1)),
+            style: item.style,
           };
         });
+
+        // Create consolidator node between raw-ehr-data-zone and data-zone
+        // Raw EHR zone: y: -5600 to -1400 (bottom at -1400)
+        // Data zone: y: 500 to 2000 (top at 500)
+        // Middle point: (-1400 + 500) / 2 = -450
+        // Adjust for node height (approx 400px): -450 - 200 = -650
+        const dataConsolidatorNode: Node = {
+          id: 'data-consolidator',
+          type: 'custom',
+          position: { x: 1200, y: -650 },
+          data: {
+            label: 'Data Consolidator',
+            content: 'Processing and consolidating EHR data',
+            color: '#2196F3',
+            icon: 'merge',
+            badge: 'Consolidated'
+          },
+          draggable: true,
+          selectable: true,
+          zIndex: 0,
+        };
+
+        // Create consolidator node between data-zone and adverse-events-zone
+        // Data zone: y: 500 to 2000 (bottom at 2000)
+        // Adverse events zone: y: 3500 to 5800 (top at 3500)
+        // Middle point: (2000 + 3500) / 2 = 2750
+        // Adjust for node height (approx 400px): 2750 - 200 = 2550
+        const adverseEventConsolidatorNode: Node = {
+          id: 'adverse-event-consolidator',
+          type: 'custom',
+          position: { x: 1200, y: 2550 },
+          data: {
+            label: 'Adverse Event Analyzer',
+            content: 'Analyzing patient data for adverse events',
+            color: '#2196F3',
+            icon: 'alert',
+            badge: 'Analyzed'
+          },
+          draggable: true,
+          selectable: true,
+          zIndex: 0,
+        };
 
         console.log('🎨 Creating nodes:', {
           zones: zoneNodes.length,
           items: itemNodes.length,
-          total: zoneNodes.length + itemNodes.length
+          consolidators: 2,
+          total: zoneNodes.length + itemNodes.length + 2
         });
         
-        setNodes([...zoneNodes, ...itemNodes]);
+        setNodes([...zoneNodes, dataConsolidatorNode, adverseEventConsolidatorNode, ...itemNodes]);
 
         // Create edges for triage flow connections
         const triageEdges: Edge[] = [
@@ -404,8 +915,155 @@ function Canvas2() {
             style: { stroke: '#26a69a', strokeWidth: 2 },
           },
         ];
+
+        // Create edges for encounter document connections (1→2→3→4→5→6)
+        const encounterEdges: Edge[] = [
+          {
+            id: 'edge-encounter-1-2',
+            source: 'dashboard-item-1759906300003-single-encounter-1',
+            sourceHandle: 'right',
+            target: 'dashboard-item-1759906300004-single-encounter-2',
+            targetHandle: 'left',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#3b82f6', strokeWidth: 3 },
+          },
+          {
+            id: 'edge-encounter-2-3',
+            source: 'dashboard-item-1759906300004-single-encounter-2',
+            sourceHandle: 'right',
+            target: 'dashboard-item-1759906300004-single-encounter-3',
+            targetHandle: 'left',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#8b5cf6', strokeWidth: 3 },
+          },
+          {
+            id: 'edge-encounter-3-4',
+            source: 'dashboard-item-1759906300004-single-encounter-3',
+            sourceHandle: 'right',
+            target: 'dashboard-item-1759906300004-single-encounter-4',
+            targetHandle: 'left',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#10b981', strokeWidth: 3 },
+          },
+          {
+            id: 'edge-encounter-4-5',
+            source: 'dashboard-item-1759906300004-single-encounter-4',
+            sourceHandle: 'right',
+            target: 'dashboard-item-1759906300004-single-encounter-5',
+            targetHandle: 'left',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#f59e0b', strokeWidth: 3 },
+          },
+          {
+            id: 'edge-encounter-5-6',
+            source: 'dashboard-item-1759906300004-single-encounter-5',
+            sourceHandle: 'right',
+            target: 'dashboard-item-1759906300004-single-encounter-6',
+            targetHandle: 'left',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#ef4444', strokeWidth: 3 },
+          },
+        ];
+
+        // Create edges for EHR hub to sub-zone connections dynamically based on hub colors
+        const ehrHubItems = allItems.filter((item: any) => item.type === 'ehrHub');
+        const ehrHubEdges: Edge[] = ehrHubItems
+          .map((hub: any) => {
+            const hubId = hub.id;
+            const hubName = hubId.replace('ehr-hub-', '');
+            const subzoneId = `subzone-${hubName}`;
+            const hubColor = hub.data?.color || '#f59e0b'; // Default color if not specified
+            
+            // Check if corresponding subzone exists
+            const subzoneExists = allItems.some((item: any) => item.id === subzoneId);
+            
+            if (!subzoneExists) {
+              return null;
+            }
+            
+            return {
+              id: `edge-${hubName}-to-zone`,
+              source: hubId,
+              sourceHandle: 'bottom',
+              target: subzoneId,
+              targetHandle: 'top',
+              type: 'default',
+              animated: true,
+              style: { stroke: hubColor, strokeWidth: 4 },
+            } as Edge;
+          })
+          .filter((edge): edge is Edge => edge !== null);
         
-        setEdges(triageEdges);
+        // Create edges for zone consolidator connections
+        const consolidatorEdges: Edge[] = [
+          // Raw EHR Data → Data Consolidator → Data Zone
+          {
+            id: 'edge-raw-ehr-to-consolidator',
+            source: 'zone-raw-ehr-data-zone',
+            sourceHandle: 'bottom',
+            target: 'data-consolidator',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#2196F3', strokeWidth: 6 },
+          },
+          {
+            id: 'edge-consolidator-to-data-zone',
+            source: 'data-consolidator',
+            target: 'zone-data-zone',
+            targetHandle: 'top',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#2196F3', strokeWidth: 6 },
+          },
+          // Data Zone → Adverse Event Analyzer → Adverse Events Zone
+          {
+            id: 'edge-data-zone-to-adverse-analyzer',
+            source: 'zone-data-zone',
+            sourceHandle: 'bottom',
+            target: 'adverse-event-consolidator',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#2196F3', strokeWidth: 6 },
+          },
+          {
+            id: 'edge-adverse-analyzer-to-adverse-zone',
+            source: 'adverse-event-consolidator',
+            target: 'zone-adv-event-zone',
+            targetHandle: 'top',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#2196F3', strokeWidth: 6 },
+          },
+          // Raw EHR Data → Task Management Zone (direct connection with curved bezier)
+          {
+            id: 'edge-raw-ehr-to-task-zone',
+            source: 'zone-raw-ehr-data-zone',
+            sourceHandle: 'right',
+            target: 'zone-task-management-zone',
+            targetHandle: 'left',
+            type: 'bezier',
+            animated: true,
+            style: { stroke: '#2196F3', strokeWidth: 4 },
+          },
+          // Raw EHR Data → Retrieved Data Zone (direct connection with curved bezier)
+          {
+            id: 'edge-raw-ehr-to-retrieved-zone',
+            source: 'zone-raw-ehr-data-zone',
+            sourceHandle: 'right',
+            target: 'zone-retrieved-data-zone',
+            targetHandle: 'left',
+            type: 'bezier',
+            animated: true,
+            style: { stroke: '#2196F3', strokeWidth: 4 },
+          },
+        ];
+        
+        setEdges([...triageEdges, ...encounterEdges, ...ehrHubEdges, ...consolidatorEdges]);
       } catch (error) {
         console.error('❌ Error loading items:', error);
       }
@@ -1199,9 +1857,18 @@ function Canvas2() {
           defaultViewport={{ x: 0, y: 0, zoom: 0.15 }}
           proOptions={{ hideAttribution: true }}
           selectNodesOnDrag={false}
+          connectOnClick={false}
+          nodesDraggable={true}
+          nodesConnectable={false}
+          elementsSelectable={true}
         >
           <Controls />
-          <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
+          <Background 
+            variant={BackgroundVariant.Dots} 
+            gap={32} 
+            size={0.8}
+            color="rgba(2, 136, 209, 0.08)"
+          />
         </ReactFlow>
       </ReactFlowWrapper>
       
@@ -1222,10 +1889,11 @@ function Canvas2() {
               position: 'absolute',
               bottom: '100%',
               right: '0',
-              marginBottom: '8px',
+              marginBottom: '12px',
               background: 'white',
-              borderRadius: '8px',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+              borderRadius: '12px',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.12)',
+              border: '1px solid rgba(0, 0, 0, 0.06)',
               overflow: 'hidden',
               minWidth: '180px',
               zIndex: 1001,
@@ -1244,18 +1912,19 @@ function Canvas2() {
                 alignItems: 'center',
                 gap: '12px',
                 fontSize: '14px',
-                color: '#374151',
+                color: '#1e293b',
+                fontWeight: 500,
                 transition: 'background 0.15s ease',
                 textAlign: 'left',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#f3f4f6';
+                e.currentTarget.style.background = '#f8fafc';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent';
               }}
             >
-              <FileText size={18} style={{ color: '#6b7280' }} />
+              <FileText size={18} style={{ color: '#64748b' }} />
               <span>Add Note</span>
             </button>
             <button
@@ -1270,18 +1939,19 @@ function Canvas2() {
                 alignItems: 'center',
                 gap: '12px',
                 fontSize: '14px',
-                color: '#374151',
+                color: '#1e293b',
+                fontWeight: 500,
                 transition: 'background 0.15s ease',
                 textAlign: 'left',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#f3f4f6';
+                e.currentTarget.style.background = '#f8fafc';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent';
               }}
             >
-              <ImageIcon size={18} style={{ color: '#6b7280' }} />
+              <ImageIcon size={18} style={{ color: '#64748b' }} />
               <span>Add Image</span>
             </button>
           </div>
@@ -1291,14 +1961,14 @@ function Canvas2() {
         <button
           onClick={() => setShowAddMenu(!showAddMenu)}
           style={{
-            width: '44px',
-            height: '44px',
-            border: 'none',
-            borderRadius: '8px',
-            background: '#ffffffff',
-            color: 'black',
+            width: '52px',
+            height: '52px',
+            border: '2px solid rgba(2, 136, 209, 0.2)',
+            borderRadius: '14px',
+            background: 'linear-gradient(135deg, #0288d1 0%, #03a9f4 100%)',
+            color: 'white',
             cursor: 'pointer',
-            boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)',
+            boxShadow: '0 4px 16px rgba(2, 136, 209, 0.3)',
             transition: 'all 0.2s ease',
             display: 'flex',
             alignItems: 'center',
@@ -1306,15 +1976,15 @@ function Canvas2() {
           }}
           title="Add Item"
           onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-1px)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.4)';
+            e.currentTarget.style.transform = 'translateY(-3px) scale(1.05)';
+            e.currentTarget.style.boxShadow = '0 6px 20px rgba(2, 136, 209, 0.4)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 2px 8px rgba(59, 130, 246, 0.3)';
+            e.currentTarget.style.transform = 'translateY(0) scale(1)';
+            e.currentTarget.style.boxShadow = '0 4px 16px rgba(2, 136, 209, 0.3)';
           }}
         >
-          <Plus size={20} style={{ 
+          <Plus size={22} style={{ 
             transform: showAddMenu ? 'rotate(45deg)' : 'rotate(0deg)',
             transition: 'transform 0.2s ease'
           }} />
@@ -1324,13 +1994,13 @@ function Canvas2() {
         <button
           onClick={handleToggleMute}
           style={{
-            width: '44px',
-            height: '44px',
-            border: '1px solid #e5e7eb',
-            borderRadius: '8px',
-            background: 'white',
+            width: '52px',
+            height: '52px',
+            border: `2px solid ${isMuted ? 'rgba(239, 68, 68, 0.3)' : 'rgba(34, 197, 94, 0.3)'}`,
+            borderRadius: '14px',
+            background: isMuted ? 'rgba(254, 226, 226, 0.5)' : 'rgba(220, 252, 231, 0.5)',
             cursor: 'pointer',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            boxShadow: isMuted ? '0 4px 16px rgba(239, 68, 68, 0.15)' : '0 4px 16px rgba(34, 197, 94, 0.15)',
             transition: 'all 0.2s ease',
             display: 'flex',
             alignItems: 'center',
@@ -1338,18 +2008,22 @@ function Canvas2() {
           }}
           title={isMuted ? 'Unmute Agent' : 'Mute Agent'}
           onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-1px)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+            e.currentTarget.style.transform = 'translateY(-3px) scale(1.05)';
+            e.currentTarget.style.boxShadow = isMuted 
+              ? '0 6px 20px rgba(239, 68, 68, 0.3)' 
+              : '0 6px 20px rgba(34, 197, 94, 0.3)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
+            e.currentTarget.style.transform = 'translateY(0) scale(1)';
+            e.currentTarget.style.boxShadow = isMuted 
+              ? '0 4px 16px rgba(239, 68, 68, 0.15)' 
+              : '0 4px 16px rgba(34, 197, 94, 0.15)';
           }}
         >
           {isMuted ? (
-            <MicOff size={20} style={{ color: '#ef4444' }} />
+            <MicOff size={22} style={{ color: '#ef4444' }} />
           ) : (
-            <Mic size={20} style={{ color: '#10b981' }} />
+            <Mic size={22} style={{ color: '#22c55e' }} />
           )}
         </button>
 
@@ -1357,14 +2031,14 @@ function Canvas2() {
         <button
           onClick={() => setShowResetModal(true)}
           style={{
-            width: '44px',
-            height: '44px',
-            border: '1px solid #e5e7eb',
-            borderRadius: '8px',
+            width: '52px',
+            height: '52px',
+            border: '2px solid rgba(2, 136, 209, 0.15)',
+            borderRadius: '14px',
             background: 'white',
-            color: '#6b7280',
+            color: '#0288d1',
             cursor: 'pointer',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            boxShadow: '0 4px 16px rgba(2, 136, 209, 0.12)',
             transition: 'all 0.2s ease',
             display: 'flex',
             alignItems: 'center',
@@ -1372,19 +2046,21 @@ function Canvas2() {
           }}
           title="Reset Board (Delete All API Items)"
           onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-1px)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
-            e.currentTarget.style.color = '#dc2626';
-            e.currentTarget.style.borderColor = '#fca5a5';
+            e.currentTarget.style.transform = 'translateY(-3px) scale(1.05)';
+            e.currentTarget.style.boxShadow = '0 6px 20px rgba(239, 68, 68, 0.3)';
+            e.currentTarget.style.background = '#ef4444';
+            e.currentTarget.style.color = 'white';
+            e.currentTarget.style.borderColor = '#ef4444';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
-            e.currentTarget.style.color = '#6b7280';
-            e.currentTarget.style.borderColor = '#e5e7eb';
+            e.currentTarget.style.transform = 'translateY(0) scale(1)';
+            e.currentTarget.style.boxShadow = '0 4px 16px rgba(2, 136, 209, 0.12)';
+            e.currentTarget.style.background = 'white';
+            e.currentTarget.style.color = '#0288d1';
+            e.currentTarget.style.borderColor = 'rgba(2, 136, 209, 0.15)';
           }}
         >
-          <X size={20} />
+          <X size={22} />
         </button>
       </div>
 

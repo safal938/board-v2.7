@@ -331,7 +331,7 @@ const checkCollision = (item1, item2) => {
 
 // Task Management Zone boundaries
 const TASK_ZONE = {
-  x: 4200,
+  x: 5800,
   y: -2300,
   width: 2000,
   height: 2100,
@@ -339,7 +339,7 @@ const TASK_ZONE = {
 
 // Retrieved Data Zone boundaries
 const RETRIEVED_DATA_ZONE = {
-  x: 4200,
+  x: 5800,
   y: -4600,
   width: 2000,
   height: 2100,
@@ -578,7 +578,7 @@ const findPositionInZone = (newItem, existingItems, zoneConfig) => {
 
 // Doctor's Notes Zone boundaries
 const DOCTORS_NOTE_ZONE = {
-  x: 4200,
+  x: 5800,
   y: 0,
   width: 2000,
   height: 2100,
@@ -1177,9 +1177,9 @@ app.post("/api/agents", async (req, res) => {
 
     // Zone configuration mapping
     const zoneConfig = {
-      "task-management-zone": { x: 4200, y: -2300, width: 2000, height: 2100 },
-      "retrieved-data-zone": { x: 4200, y: -4600, width: 2000, height: 2100 },
-      "doctors-note-zone": { x: 4200, y: 0, width: 2000, height: 2100 },
+      "task-management-zone": { x: 5800, y: -2300, width: 2000, height: 2100 },
+      "retrieved-data-zone": { x: 5800, y: -4600, width: 2000, height: 2100 },
+      "doctors-note-zone": { x: 5800, y: 0, width: 2000, height: 2100 },
       "adv-event-zone": { x: 0, y: 0, width: 4000, height: 2300 },
       "data-zone": { x: 0, y: -1300, width: 4000, height: 1000 },
       "raw-ehr-data-zone": { x: 0, y: -4600, width: 4000, height: 3000 },
