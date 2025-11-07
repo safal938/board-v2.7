@@ -485,7 +485,7 @@ const findTaskZonePosition = (newItem, existingItems) => {
 
 // Generic function to find position in any zone
 const findPositionInZone = (newItem, existingItems, zoneConfig) => {
-  const padding = 60; // Space between items
+  const padding = 60; // Space between items (increased for better spacing)
   const colWidth = 520; // Standard column width for items
   const startX = zoneConfig.x + 60; // Start 60px from left edge
   const startY = zoneConfig.y + 60; // Start 60px from top edge
@@ -531,7 +531,7 @@ const findPositionInZone = (newItem, existingItems, zoneConfig) => {
       }
 
       console.log(
-        `📦 Item ${item.id} in column ${col}, bottom at ${itemBottom}px (height: ${itemHeight}px)`
+        `📦 Item ${item.id} (${item.type}) in column ${col}, bottom at ${itemBottom}px (height: ${itemHeight}px)`
       );
     }
   });
@@ -571,7 +571,7 @@ const findPositionInZone = (newItem, existingItems, zoneConfig) => {
     return { x: startX, y: startY };
   }
 
-  console.log(`✅ Placing item in column ${bestCol} at (${x}, ${y})`);
+  console.log(`✅ Placing ${newItem.type} item in column ${bestCol} at (${x}, ${y})`);
 
   return { x, y };
 };
@@ -1167,7 +1167,7 @@ app.post("/api/todos", async (req, res) => {
 // POST /api/agents - Create a new agent result item
 app.post("/api/agents", async (req, res) => {
   try {
-    const { title, content, zone } = req.body || {};
+    const { title, content, zone, x, y, width, height } = req.body || {};
 
     if (!title || !content) {
       return res.status(400).json({
@@ -1188,20 +1188,21 @@ app.post("/api/agents", async (req, res) => {
 
     // Calculate dynamic height based on content
     const calculateHeight = (content) => {
-      const baseHeight = 80; // Header + padding
+      const baseHeight = 100; // Header + padding
       const lineHeight = 20; // Approximate line height
-      const maxWidth = 520; // Container width
+      const maxWidth = 480; // Container width (accounting for padding)
 
       // Estimate lines based on content length and width
-      const estimatedLines = Math.ceil(content.length / (maxWidth / 12)); // 12px char width
-      const contentHeight = Math.max(estimatedLines * lineHeight, 100); // Minimum 100px
+      const estimatedLines = Math.ceil(content.length / (maxWidth / 8)); // ~8px char width
+      const contentHeight = Math.max(estimatedLines * lineHeight, 120); // Minimum 120px
 
       return Math.min(baseHeight + contentHeight, 800); // Cap at 800px
     };
 
     // Build item
     const id = `item-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
-    const dynamicHeight = calculateHeight(content);
+    const itemWidth = width || 520;
+    const dynamicHeight = height || calculateHeight(content);
 
     // Load existing items for positioning BEFORE creating the item
     const existingItems = await loadBoardItems();
@@ -1211,19 +1212,19 @@ app.post("/api/agents", async (req, res) => {
 
     // Determine position based on zone parameter
     let itemX, itemY;
-    if (req.body.x !== undefined && req.body.y !== undefined) {
+    if (x !== undefined && y !== undefined) {
       // Manual positioning - use provided coordinates
-      itemX = req.body.x;
-      itemY = req.body.y;
+      itemX = x;
+      itemY = y;
       console.log(
         `📍 Using provided coordinates for AGENT item at (${itemX}, ${itemY})`
       );
     } else if (zone && zoneConfig[zone]) {
-      // Zone-based positioning
+      // Zone-based positioning with proper spacing
       const targetZone = zoneConfig[zone];
-      const tempItem = { type: "agent", width: 520, height: dynamicHeight };
+      const tempItem = { type: "agent", width: itemWidth, height: dynamicHeight };
 
-      // Find position within specified zone
+      // Use generic zone positioning function for consistent spacing
       const zonePosition = findPositionInZone(
         tempItem,
         existingItems,
@@ -1235,13 +1236,13 @@ app.post("/api/agents", async (req, res) => {
         `📍 Auto-positioned AGENT item in ${zone} at (${itemX}, ${itemY})`
       );
     } else {
-      // Default: Auto-positioning - use Task Zone
-      const tempItem = { type: "agent", width: 520, height: dynamicHeight };
+      // Default: Auto-positioning - use Task Management Zone
+      const tempItem = { type: "agent", width: itemWidth, height: dynamicHeight };
       const taskPosition = findTaskZonePosition(tempItem, existingItems);
       itemX = taskPosition.x;
       itemY = taskPosition.y;
       console.log(
-        `📍 Auto-positioned AGENT item in Task Zone (default) at (${itemX}, ${itemY})`
+        `📍 Auto-positioned AGENT item in Task Management Zone (default) at (${itemX}, ${itemY})`
       );
     }
 
@@ -1250,7 +1251,7 @@ app.post("/api/agents", async (req, res) => {
       type: "agent",
       x: itemX,
       y: itemY,
-      width: 520,
+      width: itemWidth,
       height: dynamicHeight,
       content: content,
       color: "#ffffff",
@@ -1273,8 +1274,11 @@ app.post("/api/agents", async (req, res) => {
       item: newItem,
       timestamp: new Date().toISOString(),
       action: "created",
+      zone: zone || "task-management-zone",
     };
     broadcastSSE(payload);
+
+    console.log(`✅ Created agent item ${id} in ${zone || "task-management-zone"} at (${itemX}, ${itemY})`);
 
     res.status(201).json(newItem);
   } catch (error) {
