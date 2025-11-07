@@ -7,13 +7,16 @@ interface TriageFlowNodeProps {
     label: string;
     count?: number;
     metrics?: {
-      ALF: number;
-      SAH: number;
-      DILI: number;
-      HE: number;
+      ALF?: number;
+      SAH?: number;
+      DILI?: number;
+      HE?: number;
+      [key: string]: any;
     };
     gridSize?: number;
-    type: 'triage' | 'category' | 'grid';
+    type: 'triage' | 'category' | 'grid' | 'ehr_hub';
+    systemType?: string;
+    description?: string;
   };
 }
 
@@ -132,6 +135,54 @@ const GridSquare = styled.div<{ filled: boolean }>`
 
 const TriageFlowNode: React.FC<TriageFlowNodeProps> = ({ data }) => {
   const { label, count, metrics, gridSize, type } = data;
+
+  // EHR Hub Node - Simple design with system name and document count
+  if (type === 'ehr_hub') {
+    return (
+      <NodeContainer type="ehr_hub" style={{
+        background: 'linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%)',
+        border: '3px solid #ffa726',
+        borderRadius: '16px',
+        padding: '32px 40px',
+        minWidth: '280px',
+        boxShadow: '0 4px 16px rgba(255, 167, 38, 0.2)',
+      }}>
+        <Handle type="target" position={Position.Top} style={{ background: '#ffa726', width: 14, height: 14 }} />
+        
+        <Title style={{ 
+          fontSize: '22px', 
+          fontWeight: '700', 
+          color: '#e65100',
+          marginBottom: '16px',
+          textAlign: 'center'
+        }}>
+          {label}
+        </Title>
+        
+        <Count style={{ 
+          fontSize: '48px', 
+          fontWeight: '800', 
+          color: '#f57c00',
+          textAlign: 'center',
+          margin: '0'
+        }}>
+          {count}
+        </Count>
+        
+        <Subtitle style={{ 
+          fontSize: '14px', 
+          color: '#e65100',
+          textAlign: 'center',
+          marginTop: '8px',
+          fontWeight: '500'
+        }}>
+          documents
+        </Subtitle>
+        
+        <Handle type="source" position={Position.Bottom} style={{ background: '#ffa726', width: 14, height: 14 }} />
+      </NodeContainer>
+    );
+  }
 
   if (type === 'triage') {
     return (

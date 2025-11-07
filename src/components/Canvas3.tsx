@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import ReactFlow, {
   Controls,
   Background,
@@ -17,6 +17,9 @@ import styled from 'styled-components';
 import 'reactflow/dist/style.css';
 import { FileText, Database, Settings, Users } from 'lucide-react';
 import EncounterDocument from './encounters/EncounterDocument';
+import TriageFlowNode from './TriageFlowNode';
+import EHRHubNode from './EHRHubNode';
+import boardItemsData from '../data/boardItems.json';
 
 const ReactFlowWrapper = styled.div`
   width: 100%;
@@ -104,6 +107,60 @@ function CustomNode({ data }: NodeProps) {
       </NodeTitle>
       {data.content && <NodeContent>{data.content}</NodeContent>}
     </NodeContainer>
+  );
+}
+
+// Raw EHR Data Node - displays raw data items
+const RawDataNodeContainer = styled.div`
+  background: white;
+  border: 2px solid #9C27B0;
+  border-radius: 12px;
+  padding: 16px;
+  min-width: 300px;
+  max-width: 400px;
+  box-shadow: 0 4px 12px rgba(156, 39, 176, 0.15);
+  
+  &:hover {
+    box-shadow: 0 6px 16px rgba(156, 39, 176, 0.25);
+    transform: translateY(-2px);
+    transition: all 0.2s ease;
+  }
+`;
+
+const RawDataTitle = styled.div`
+  font-weight: 700;
+  font-size: 14px;
+  color: #9C27B0;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const RawDataContent = styled.div`
+  font-size: 12px;
+  color: #666;
+  line-height: 1.5;
+  max-height: 200px;
+  overflow-y: auto;
+`;
+
+function RawDataNode({ data }: NodeProps) {
+  const item = data.item;
+  
+  return (
+    <RawDataNodeContainer>
+      <Handle type="source" position={Position.Bottom} />
+      <RawDataTitle>
+        <Database size={16} />
+        {item.title || 'Raw EHR Data'}
+      </RawDataTitle>
+      <RawDataContent>
+        {item.content && typeof item.content === 'string' 
+          ? item.content.substring(0, 200) + (item.content.length > 200 ? '...' : '')
+          : 'Raw data item'}
+      </RawDataContent>
+    </RawDataNodeContainer>
   );
 }
 
@@ -196,6 +253,57 @@ function EncounterNode({ data }: NodeProps) {
 }
 
 function Canvas3() {
+  const [rawData, setRawData] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Get API base URL
+  const API_BASE_URL =
+    process.env.REACT_APP_API_BASE_URL ||
+    (window.location.hostname === "localhost"
+      ? "http://localhost:3001"
+      : window.location.origin);
+
+  // Load raw data from backend on mount
+  useEffect(() => {
+    const loadRawData = async () => {
+      try {
+        setIsLoading(true);
+        // Start with static data
+        let allItems = [...boardItemsData];
+        
+        // Try to load from backend API
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/board-items`);
+          if (response.ok) {
+            const apiItems = await response.json();
+            const staticIds = new Set(boardItemsData.map((item: any) => item.id));
+            const uniqueApiItems = apiItems.filter((item: any) => !staticIds.has(item.id));
+            allItems = [...boardItemsData, ...uniqueApiItems];
+            console.log('✅ Canvas3: Loaded items from backend:', allItems.length);
+          }
+        } catch (apiError) {
+          console.log('⚠️ Canvas3: API not available, using only static data');
+        }
+
+        // Filter for raw EHR data items, triageFlow nodes, and ehrHub nodes
+        const rawEhrItems = allItems.filter((item: any) => 
+          item.id && (item.id.includes('raw') || item.type === 'triageFlow' || item.type === 'ehrHub' || item.id.includes('ehr-'))
+        );
+        
+        console.log('📊 Canvas3: Total items loaded:', allItems.length);
+        console.log('📊 Canvas3: Found raw EHR items:', rawEhrItems.length);
+        console.log('📊 Canvas3: Raw item IDs:', rawEhrItems.map(i => i.id));
+        setRawData(rawEhrItems);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('❌ Canvas3: Error loading raw data:', error);
+        setIsLoading(false);
+      }
+    };
+
+    loadRawData();
+  }, [API_BASE_URL]);
+
   // Sample patient data for 6 encounters
   const createPatientData = (encounterNum: number) => ({
     patient: {
@@ -296,8 +404,30 @@ function Canvas3() {
     }]
   });
 
-  // Initial nodes - 2 zones with 6 encounters each
+  // Initial nodes - Raw EHR Data Zone + 2 zones with 6 encounters each
   const initialNodes: Node[] = [
+    // Raw EHR Data Zone - from Canvas2
+    {
+      id: 'zone-raw-ehr',
+      type: 'zone',
+      position: { x: 0, y: -4600 },
+      data: { 
+        label: 'Raw EHR Data Zone',
+        color: '#9C27B0',
+        handlePosition: 'bottom'
+      },
+      style: { 
+        width: 4000, 
+        height: 3000,
+        background: 'linear-gradient(135deg, rgba(156, 39, 176, 0.1) 0%, rgba(142, 36, 170, 0.15) 50%, rgba(156, 39, 176, 0.1) 100%)',
+        border: '3px solid #9C27B0',
+        borderRadius: '12px'
+      },
+      draggable: false,
+      selectable: false,
+      zIndex: -1,
+    },
+    
     // Zone 1 - Background
     {
       id: 'zone-1',
@@ -367,6 +497,20 @@ function Canvas3() {
       selectable: false,
       zIndex: -1,
     },
+    
+    // Raw EHR Data Items - populate from loaded data
+    ...rawData.map((item: any, index: number) => ({
+      id: item.id,
+      type: 'rawData',
+      position: { 
+        x: item.x || (100 + (index % 10) * 380), 
+        y: item.y || (-4400 + Math.floor(index / 10) * 250)
+      },
+      data: { item },
+      draggable: true,
+      selectable: true,
+      zIndex: 1,
+    })),
     
     // Raw Data Consolidator Node - between zones
     {
@@ -526,6 +670,17 @@ function Canvas3() {
       style: { stroke: '#ef4444', strokeWidth: 3 }
     },
     
+    // Connection from Raw EHR Zone to Consolidator
+    {
+      id: 'e-raw-to-consolidator',
+      source: 'zone-raw-ehr',
+      sourceHandle: 'bottom',
+      target: 'consolidator',
+      type: 'default',
+      animated: true,
+      style: { stroke: '#9C27B0', strokeWidth: 6 }
+    },
+    
     // Connection from Zone 1 to Consolidator
     {
       id: 'e-zone1-to-consolidator',
@@ -549,8 +704,19 @@ function Canvas3() {
     },
   ];
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  // Update nodes when raw data is loaded
+  useEffect(() => {
+    if (rawData.length > 0) {
+      console.log('📊 Canvas3: Populating nodes with raw data:', rawData.length);
+      console.log('📊 Canvas3: Total nodes to create:', initialNodes.length);
+      const rawDataNodes = initialNodes.filter(n => n.type === 'rawData');
+      console.log('📊 Canvas3: Raw data nodes:', rawDataNodes.length);
+      setNodes(initialNodes);
+    }
+  }, [rawData, setNodes, initialNodes]);
 
   const onConnect = useCallback(
     (params: Connection | Edge) => setEdges((eds) => addEdge(params, eds)),
@@ -561,7 +727,29 @@ function Canvas3() {
     custom: CustomNode,
     encounter: EncounterNode,
     zone: ZoneNode,
+    rawData: RawDataNode,
+    triageFlow: TriageFlowNode,
+    ehrHub: EHRHubNode,
   }), []);
+
+  // Display loading state
+  if (isLoading) {
+    return (
+      <div style={{ 
+        width: '100vw', 
+        height: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #f0f9ff 0%, #f0fdf4 100%)',
+        fontSize: '18px',
+        color: '#00897b',
+        fontWeight: 600
+      }}>
+        Loading raw data... ({rawData.length} items found)
+      </div>
+    );
+  }
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
@@ -583,6 +771,24 @@ function Canvas3() {
           <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
         </ReactFlow>
       </ReactFlowWrapper>
+      
+      {/* Data Info Overlay */}
+      <div style={{
+        position: 'absolute',
+        top: 20,
+        left: 20,
+        background: 'white',
+        padding: '12px 20px',
+        borderRadius: '12px',
+        boxShadow: '0 4px 16px rgba(0, 137, 123, 0.15)',
+        border: '2px solid rgba(0, 137, 123, 0.2)',
+        zIndex: 1000,
+        fontSize: '14px',
+        fontWeight: 600,
+        color: '#00897b'
+      }}>
+        📊 Raw Data Items: {rawData.length}
+      </div>
     </div>
   );
 }

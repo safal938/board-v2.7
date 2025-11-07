@@ -1017,8 +1017,8 @@
   {
     "id": "raw-nervecentre-encounter-1",
     "type": "component",
-    "x": 100,
-    "y": -2700,
+    "x": -1300,
+    "y": -2800,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1043,8 +1043,8 @@
   {
     "id": "raw-nervecentre-encounter-2",
     "type": "component",
-    "x": 650,
-    "y": -2700,
+    "x": -750,
+    "y": -2800,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1067,8 +1067,8 @@
   {
     "id": "raw-nervecentre-encounter-3",
     "type": "component",
-    "x": 1200,
-    "y": -2700,
+    "x": -200,
+    "y": -2800,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1091,8 +1091,8 @@
   {
     "id": "raw-nervecentre-encounter-4",
     "type": "component",
-    "x": 1750,
-    "y": -2700,
+    "x": 350,
+    "y": -2800,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1115,8 +1115,8 @@
   {
     "id": "raw-nervecentre-encounter-5",
     "type": "component",
-    "x": 2300,
-    "y": -2700,
+    "x": 900,
+    "y": -2800,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1139,8 +1139,8 @@
   {
     "id": "raw-nervecentre-encounter-6",
     "type": "component",
-    "x": 2850,
-    "y": -2700,
+    "x": 1450,
+    "y": -2800,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1165,8 +1165,8 @@
   {
     "id": "raw-medilogik-ems-colonoscopy",
     "type": "component",
-    "x": 100,
-    "y": -3500,
+    "x": -1300,
+    "y": -3600,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1191,8 +1191,8 @@
   {
     "id": "raw-viper-ultrasound-ivc",
     "type": "component",
-    "x": 650,
-    "y": -3500,
+    "x": -500,
+    "y": -3600,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1217,8 +1217,8 @@
   {
     "id": "raw-bighand-dictation-hayes-2015",
     "type": "component",
-    "x": 1200,
-    "y": -3500,
+    "x": -1300,
+    "y": -3600,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1243,8 +1243,8 @@
   {
     "id": "raw-bighand-dictation-green-2021",
     "type": "component",
-    "x": 1750,
-    "y": -3500,
+    "x": -650,
+    "y": -3600,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1269,8 +1269,8 @@
   {
     "id": "raw-bighand-dictation-chen-2025",
     "type": "component",
-    "x": 2300,
-    "y": -3500,
+    "x": 0,
+    "y": -3600,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1295,8 +1295,8 @@
   {
     "id": "raw-ice-lab-data-encounter-1",
     "type": "component",
-    "x": 100,
-    "y": -4200,
+    "x": -1300,
+    "y": -4300,
     "width": 400,
     "height": 600,
     "componentType": "ICELabData",
@@ -1433,8 +1433,8 @@
   {
     "id": "raw-ice-lab-data-encounter-2",
     "type": "component",
-    "x": 650,
-    "y": -4200,
+    "x": -850,
+    "y": -4300,
     "width": 400,
     "height": 600,
     "componentType": "ICELabData",
@@ -1522,8 +1522,8 @@
   {
     "id": "raw-ice-lab-data-encounter-3",
     "type": "component",
-    "x": 1200,
-    "y": -4200,
+    "x": -400,
+    "y": -4300,
     "width": 400,
     "height": 600,
     "componentType": "ICELabData",
@@ -1611,8 +1611,8 @@
   {
     "id": "raw-ice-lab-data-encounter-5",
     "type": "component",
-    "x": 1750,
-    "y": -4200,
+    "x": 50,
+    "y": -4300,
     "width": 400,
     "height": 600,
     "componentType": "ICELabData",
@@ -1709,8 +1709,8 @@
   {
     "id": "raw-ice-lab-data-encounter-6",
     "type": "component",
-    "x": 2300,
-    "y": -4400,
+    "x": 500,
+    "y": -4300,
     "width": 400,
     "height": 600,
     "componentType": "ICELabData",
@@ -1900,90 +1900,193 @@
     "updatedAt": "2025-10-28T12:00:00.000Z"
   },
   {
-    "id": "triage-node-main",
-    "type": "triageFlow",
-    "x": -2000,
-    "y": -1800,
-    "width": 200,
+    "id": "ehr-hub-nervecentre",
+    "type": "ehrHub",
+    "x": -1200,
+    "y": -5400,
+    "width": 350,
+    "height": 250,
+    "data": {
+      "label": "Nervecentre EPR",
+      "count": 6,
+      "description": "Primary EPR system for clinical encounters"
+    },
+    "createdAt": "2025-11-06T12:00:00.000Z",
+    "updatedAt": "2025-11-06T12:00:00.000Z"
+  },
+  {
+    "id": "ehr-hub-ice",
+    "type": "ehrHub",
+    "x": -750,
+    "y": -5400,
+    "width": 350,
+    "height": 250,
+    "data": {
+      "label": "ICE Laboratory",
+      "count": 6,
+      "description": "Laboratory information system"
+    },
+    "createdAt": "2025-11-06T12:00:00.000Z",
+    "updatedAt": "2025-11-06T12:00:00.000Z"
+  },
+  {
+    "id": "ehr-hub-bighand",
+    "type": "ehrHub",
+    "x": -300,
+    "y": -5400,
+    "width": 350,
+    "height": 250,
+    "data": {
+      "label": "BigHand Dictation",
+      "count": 3,
+      "description": "Clinical dictation and transcription"
+    },
+    "createdAt": "2025-11-06T12:00:00.000Z",
+    "updatedAt": "2025-11-06T12:00:00.000Z"
+  },
+  {
+    "id": "ehr-hub-medilogik",
+    "type": "ehrHub",
+    "x": -1200,
+    "y": -5000,
+    "width": 300,
     "height": 200,
     "data": {
-      "label": "Triage Inbox",
-      "count": 12.5,
-      "type": "triage"
+      "label": "Medilogik EMS",
+      "count": 1,
+      "description": "Endoscopy management system"
     },
-    "createdAt": "2025-11-05T12:00:00.000Z",
-    "updatedAt": "2025-11-05T12:00:00.000Z"
+    "createdAt": "2025-11-06T12:00:00.000Z",
+    "updatedAt": "2025-11-06T12:00:00.000Z"
   },
   {
-    "id": "triage-node-category-alf",
-    "type": "triageFlow",
-    "x": -1600,
-    "y": -1900,
-    "width": 250,
-    "height": 300,
-    "data": {
-      "label": "ALF Category",
-      "count": 45,
-      "type": "category",
-      "metrics": {
-        "ALF": 12,
-        "SAH": 8,
-        "DILI": 15,
-        "HE": 10
-      }
-    },
-    "createdAt": "2025-11-05T12:00:00.000Z",
-    "updatedAt": "2025-11-05T12:00:00.000Z"
-  },
-  {
-    "id": "triage-node-category-sah",
-    "type": "triageFlow",
-    "x": -1600,
-    "y": -1500,
-    "width": 250,
-    "height": 300,
-    "data": {
-      "label": "SAH Category",
-      "count": 32,
-      "type": "category",
-      "metrics": {
-        "ALF": 5,
-        "SAH": 18,
-        "DILI": 6,
-        "HE": 3
-      }
-    },
-    "createdAt": "2025-11-05T12:00:00.000Z",
-    "updatedAt": "2025-11-05T12:00:00.000Z"
-  },
-  {
-    "id": "triage-node-grid-alf",
-    "type": "triageFlow",
-    "x": -1200,
-    "y": -1900,
+    "id": "ehr-hub-viper",
+    "type": "ehrHub",
+    "x": -800,
+    "y": -5000,
     "width": 300,
-    "height": 300,
+    "height": 200,
     "data": {
-      "label": "ALF Patients",
-      "gridSize": 45,
-      "type": "grid"
+      "label": "VIPER Ultrasound",
+      "count": 1,
+      "description": "Point-of-care ultrasound"
     },
-    "createdAt": "2025-11-05T12:00:00.000Z",
-    "updatedAt": "2025-11-05T12:00:00.000Z"
+    "createdAt": "2025-11-06T12:00:00.000Z",
+    "updatedAt": "2025-11-06T12:00:00.000Z"
   },
   {
-    "id": "triage-node-grid-sah",
-    "type": "triageFlow",
-    "x": -1200,
-    "y": -1500,
-    "width": 300,
-    "height": 300,
+    "id": "subzone-nervecentre",
+    "type": "zone",
+    "x": -1400,
+    "y": -2900,
+    "width": 3500,
+    "height": 850,
     "data": {
-      "label": "SAH Patients",
-      "gridSize": 32,
-      "type": "grid"
+      "label": "Nervecentre EPR Data",
+      "color": "#f59e0b",
+      "handlePosition": "top"
     },
-    "createdAt": "2025-11-05T12:00:00.000Z",
-    "updatedAt": "2025-11-05T12:00:00.000Z"
+    "style": {
+      "background": "linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(245, 158, 11, 0.12) 100%)",
+      "border": "2px solid #f59e0b",
+      "borderRadius": "12px"
+    },
+    "draggable": false,
+    "selectable": false,
+    "zIndex": -1,
+    "createdAt": "2025-11-06T14:00:00.000Z",
+    "updatedAt": "2025-11-06T14:00:00.000Z"
+  },
+  {
+    "id": "subzone-ice",
+    "type": "zone",
+    "x": -1400,
+    "y": -4400,
+    "width": 2800,
+    "height": 850,
+    "data": {
+      "label": "ICE Laboratory Data",
+      "color": "#3b82f6",
+      "handlePosition": "top"
+    },
+    "style": {
+      "background": "linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.12) 100%)",
+      "border": "2px solid #3b82f6",
+      "borderRadius": "12px"
+    },
+    "draggable": false,
+    "selectable": false,
+    "zIndex": -1,
+    "createdAt": "2025-11-06T14:00:00.000Z",
+    "updatedAt": "2025-11-06T14:00:00.000Z"
+  },
+  {
+    "id": "subzone-bighand",
+    "type": "zone",
+    "x": -1400,
+    "y": -3700,
+    "width": 2200,
+    "height": 850,
+    "data": {
+      "label": "BigHand Dictation Data",
+      "color": "#10b981",
+      "handlePosition": "top"
+    },
+    "style": {
+      "background": "linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.12) 100%)",
+      "border": "2px solid #10b981",
+      "borderRadius": "12px"
+    },
+    "draggable": false,
+    "selectable": false,
+    "zIndex": -1,
+    "createdAt": "2025-11-06T14:00:00.000Z",
+    "updatedAt": "2025-11-06T14:00:00.000Z"
+  },
+  {
+    "id": "subzone-medilogik",
+    "type": "zone",
+    "x": -1400,
+    "y": -3700,
+    "width": 700,
+    "height": 850,
+    "data": {
+      "label": "Medilogik EMS Data",
+      "color": "#8b5cf6",
+      "handlePosition": "top"
+    },
+    "style": {
+      "background": "linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0.12) 100%)",
+      "border": "2px solid #8b5cf6",
+      "borderRadius": "12px"
+    },
+    "draggable": false,
+    "selectable": false,
+    "zIndex": -1,
+    "createdAt": "2025-11-06T14:00:00.000Z",
+    "updatedAt": "2025-11-06T14:00:00.000Z"
+  },
+  {
+    "id": "subzone-viper",
+    "type": "zone",
+    "x": -600,
+    "y": -3700,
+    "width": 700,
+    "height": 850,
+    "data": {
+      "label": "VIPER Ultrasound Data",
+      "color": "#ec4899",
+      "handlePosition": "top"
+    },
+    "style": {
+      "background": "linear-gradient(135deg, rgba(236, 72, 153, 0.08) 0%, rgba(236, 72, 153, 0.12) 100%)",
+      "border": "2px solid #ec4899",
+      "borderRadius": "12px"
+    },
+    "draggable": false,
+    "selectable": false,
+    "zIndex": -1,
+    "createdAt": "2025-11-06T14:00:00.000Z",
+    "updatedAt": "2025-11-06T14:00:00.000Z"
   }
 ]
