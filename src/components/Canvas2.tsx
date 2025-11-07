@@ -1854,7 +1854,7 @@ function Canvas2() {
           fitView
           minZoom={0.01}
           maxZoom={4}
-          defaultViewport={{ x: 0, y: 0, zoom: 0.15 }}
+          defaultViewport={{ x: -200, y: -1200, zoom: 0.25 }}
           proOptions={{ hideAttribution: true }}
           selectNodesOnDrag={false}
           connectOnClick={false}
