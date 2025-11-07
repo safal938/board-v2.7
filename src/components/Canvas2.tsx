@@ -1491,7 +1491,7 @@ function Canvas2() {
     try {
       console.log(`🎤 ${isMuted ? 'Unmuting' : 'Muting'} agent...`);
       
-      const response = await fetch('https://api1.medforce-ai.com/mute', {
+      const response = await fetch('https://api.medforce-ai.com/mute', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
