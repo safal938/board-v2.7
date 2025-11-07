@@ -2257,6 +2257,65 @@ app.post("/api/reload-board-items", async (req, res) => {
   }
 });
 
+// POST /api/redis/clear - Clear all Redis data
+app.post("/api/redis/clear", async (req, res) => {
+  try {
+    if (!isRedisConnected || !redisClient) {
+      return res.status(503).json({
+        error: "Redis not connected",
+        message: "Redis is not available"
+      });
+    }
+
+    console.log("🗑️ Clearing all Redis data...");
+    
+    // Delete the boardItems key
+    await redisClient.del("boardItems");
+    
+    console.log("✅ Redis data cleared");
+    
+    res.json({
+      success: true,
+      message: "Redis data cleared successfully"
+    });
+  } catch (error) {
+    console.error("❌ Error clearing Redis:", error);
+    res.status(500).json({
+      error: "Failed to clear Redis",
+      details: error.message
+    });
+  }
+});
+
+// GET /api/redis/info - Get Redis connection info and stats
+app.get("/api/redis/info", async (req, res) => {
+  try {
+    if (!isRedisConnected || !redisClient) {
+      return res.json({
+        connected: false,
+        message: "Redis not connected"
+      });
+    }
+
+    // Get boardItems data
+    const data = await redisClient.get("boardItems");
+    const itemCount = data ? JSON.parse(data).length : 0;
+    
+    res.json({
+      connected: true,
+      itemCount: itemCount,
+      hasData: !!data,
+      redisUrl: process.env.REDIS_URL ? "configured" : "not configured"
+    });
+  } catch (error) {
+    console.error("❌ Error getting Redis info:", error);
+    res.status(500).json({
+      error: "Failed to get Redis info",
+      details: error.message
+    });
+  }
+});
+
 // POST /api/selected-item - Update currently selected item
 app.post("/api/selected-item", async (req, res) => {
   const { selectedItemId } = req.body;

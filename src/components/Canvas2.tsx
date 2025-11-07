@@ -1686,7 +1686,19 @@ function Canvas2() {
         });
         
         if (easlResetResponse.ok) {
-          console.log(`✅ EASL conversation history reset`);
+          console.log(`✅ EASL conversation history reset on backend`);
+          
+          // Also send message to EASL iframe to clear its UI
+          const easlIframe = document.querySelector('[data-item-id="iframe-item-easl-interface"] iframe') as HTMLIFrameElement;
+          if (easlIframe && easlIframe.contentWindow) {
+            easlIframe.contentWindow.postMessage({
+              type: 'CLEAR_CHATS',
+              payload: { timestamp: new Date().toISOString() }
+            }, 'https://easl-board.vercel.app');
+            console.log('📤 Sent CLEAR_CHATS message to EASL iframe');
+          } else {
+            console.warn('⚠️ EASL iframe not found, UI will not be cleared');
+          }
         }
       } catch (easlError) {
         console.warn('⚠️ Error resetting EASL conversation history:', easlError);
