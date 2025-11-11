@@ -30,6 +30,28 @@ const DiagnosticContainer = styled.div`
   border: 1px solid #e0e0e0;
 `;
 
+const TwoColumnLayout = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  
+  @media (max-width: 1200px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const LeftColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const RightColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
 const Header = styled.div`
   display: flex;
   align-items: center;
@@ -389,122 +411,130 @@ const DILIDiagnostic: React.FC<DILIDiagnosticProps> = ({
         </ActionButtons>
       </Header>
 
-      {/* Pattern Recognition Section */}
-      <Section isExpanded={expandedSections.pattern}>
-        <SectionHeader onClick={() => toggleSection('pattern')}>
-          <SectionTitle>Pattern Recognition</SectionTitle>
-          {expandedSections.pattern ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-        </SectionHeader>
-        <SectionContent isExpanded={expandedSections.pattern}>
-          <div style={{ marginBottom: '20px' }}>
-            <Badge>Classification: {pattern.classification}</Badge>
-            <Badge>R-Ratio: {pattern.R_ratio}</Badge>
-          </div>
+      <TwoColumnLayout>
+        {/* LEFT COLUMN */}
+        <LeftColumn>
+          {/* Pattern Recognition Section */}
+          <Section isExpanded={expandedSections.pattern}>
+            <SectionHeader onClick={() => toggleSection('pattern')}>
+              <SectionTitle>Pattern Recognition</SectionTitle>
+              {expandedSections.pattern ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+            </SectionHeader>
+            <SectionContent isExpanded={expandedSections.pattern}>
+              <div style={{ marginBottom: '20px' }}>
+                <Badge>Classification: {pattern.classification}</Badge>
+                <Badge>R-Ratio: {pattern.R_ratio}</Badge>
+              </div>
 
-          <SubHeading>Key Laboratory Values</SubHeading>
-          <LabGrid>
-            {pattern.keyLabs.map((lab, index) => (
-              <LabCard key={index}>
-                <LabLabel>{lab.label}</LabLabel>
-                <LabValue>
-                  {lab.value}
-                  <LabIndicator type={lab.note}>{lab.note}</LabIndicator>
-                </LabValue>
-              </LabCard>
-            ))}
-          </LabGrid>
+              <SubHeading>Key Laboratory Values</SubHeading>
+              <LabGrid>
+                {pattern.keyLabs.map((lab, index) => (
+                  <LabCard key={index}>
+                    <LabLabel>{lab.label}</LabLabel>
+                    <LabValue>
+                      {lab.value}
+                      <LabIndicator type={lab.note}>{lab.note}</LabIndicator>
+                    </LabValue>
+                  </LabCard>
+                ))}
+              </LabGrid>
 
-          <SubHeading>Clinical Features</SubHeading>
-          <SimpleList>
-            {pattern.clinicalFeatures.map((feature, index) => (
-              <SimpleListItem key={index}>{feature}</SimpleListItem>
-            ))}
-          </SimpleList>
-        </SectionContent>
-      </Section>
+              <SubHeading>Clinical Features</SubHeading>
+              <SimpleList>
+                {pattern.clinicalFeatures.map((feature, index) => (
+                  <SimpleListItem key={index}>{feature}</SimpleListItem>
+                ))}
+              </SimpleList>
+            </SectionContent>
+          </Section>
 
-      {/* Causality Analysis Section */}
-      <Section isExpanded={expandedSections.causality}>
-        <SectionHeader onClick={() => toggleSection('causality')}>
-          <SectionTitle>Causality Analysis</SectionTitle>
-          {expandedSections.causality ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-        </SectionHeader>
-        <SectionContent isExpanded={expandedSections.causality}>
-          <InfoRow>
-            <InfoLabel>Primary Drug</InfoLabel>
-            <InfoValue>
-              <strong>{causality.primaryDrug}</strong>
-            </InfoValue>
-          </InfoRow>
+          {/* Causality Analysis Section */}
+          <Section isExpanded={expandedSections.causality}>
+            <SectionHeader onClick={() => toggleSection('causality')}>
+              <SectionTitle>Causality Analysis</SectionTitle>
+              {expandedSections.causality ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+            </SectionHeader>
+            <SectionContent isExpanded={expandedSections.causality}>
+              <InfoRow>
+                <InfoLabel>Primary Drug</InfoLabel>
+                <InfoValue>
+                  <strong>{causality.primaryDrug}</strong>
+                </InfoValue>
+              </InfoRow>
 
-          <SubHeading>Contributing Factors</SubHeading>
-          <SimpleList>
-            {causality.contributingFactors.map((factor, index) => (
-              <SimpleListItem key={index}>{factor}</SimpleListItem>
-            ))}
-          </SimpleList>
+              <SubHeading>Contributing Factors</SubHeading>
+              <SimpleList>
+                {causality.contributingFactors.map((factor, index) => (
+                  <SimpleListItem key={index}>{factor}</SimpleListItem>
+                ))}
+              </SimpleList>
 
-          <SubHeading>Mechanistic Rationale</SubHeading>
-          <List>
-            {causality.mechanisticRationale.map((rationale, index) => (
-              <ListItem key={index}>{rationale}</ListItem>
-            ))}
-          </List>
-        </SectionContent>
-      </Section>
+              <SubHeading>Mechanistic Rationale</SubHeading>
+              <List>
+                {causality.mechanisticRationale.map((rationale, index) => (
+                  <ListItem key={index}>{rationale}</ListItem>
+                ))}
+              </List>
+            </SectionContent>
+          </Section>
 
-      {/* Severity Assessment Section */}
-      <Section isExpanded={expandedSections.severity}>
-        <SectionHeader onClick={() => toggleSection('severity')}>
-          <SectionTitle>Severity Assessment</SectionTitle>
-          {expandedSections.severity ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-        </SectionHeader>
-        <SectionContent isExpanded={expandedSections.severity}>
-          <SubHeading>Clinical Features</SubHeading>
-          <SimpleList>
-            {severity.features.map((feature, index) => (
-              <SimpleListItem key={index}>{feature}</SimpleListItem>
-            ))}
-          </SimpleList>
+          {/* Severity Assessment Section */}
+          <Section isExpanded={expandedSections.severity}>
+            <SectionHeader onClick={() => toggleSection('severity')}>
+              <SectionTitle>Severity Assessment</SectionTitle>
+              {expandedSections.severity ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+            </SectionHeader>
+            <SectionContent isExpanded={expandedSections.severity}>
+              <SubHeading>Clinical Features</SubHeading>
+              <SimpleList>
+                {severity.features.map((feature, index) => (
+                  <SimpleListItem key={index}>{feature}</SimpleListItem>
+                ))}
+              </SimpleList>
 
-          <HighlightBox>
-            <HighlightLabel>Prognosis</HighlightLabel>
-            <HighlightText>{severity.prognosis}</HighlightText>
-          </HighlightBox>
-        </SectionContent>
-      </Section>
+              <HighlightBox>
+                <HighlightLabel>Prognosis</HighlightLabel>
+                <HighlightText>{severity.prognosis}</HighlightText>
+              </HighlightBox>
+            </SectionContent>
+          </Section>
+        </LeftColumn>
 
-      {/* Management Plan Section */}
-      <Section isExpanded={expandedSections.management}>
-        <SectionHeader onClick={() => toggleSection('management')}>
-          <SectionTitle>Management Plan</SectionTitle>
-          {expandedSections.management ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-        </SectionHeader>
-        <SectionContent isExpanded={expandedSections.management}>
-          <SubHeading>Immediate Actions</SubHeading>
-          {management.immediateActions.map((action, index) => (
-            <ChecklistItem key={index}>
-              <Checkbox />
-              {action}
-            </ChecklistItem>
-          ))}
+        {/* RIGHT COLUMN */}
+        <RightColumn>
+          {/* Management Plan Section */}
+          <Section isExpanded={expandedSections.management}>
+            <SectionHeader onClick={() => toggleSection('management')}>
+              <SectionTitle>Management Plan</SectionTitle>
+              {expandedSections.management ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+            </SectionHeader>
+            <SectionContent isExpanded={expandedSections.management}>
+              <SubHeading>Immediate Actions</SubHeading>
+              {management.immediateActions.map((action, index) => (
+                <ChecklistItem key={index}>
+                  <Checkbox />
+                  {action}
+                </ChecklistItem>
+              ))}
 
-          <SubHeading>Consultations Required</SubHeading>
-          {management.consults.map((consult, index) => (
-            <ChecklistItem key={index}>
-              <Checkbox />
-              {consult}
-            </ChecklistItem>
-          ))}
+              <SubHeading>Consultations Required</SubHeading>
+              {management.consults.map((consult, index) => (
+                <ChecklistItem key={index}>
+                  <Checkbox />
+                  {consult}
+                </ChecklistItem>
+              ))}
 
-          <SubHeading>Monitoring Plan</SubHeading>
-          <List>
-            {management.monitoringPlan.map((plan, index) => (
-              <ListItem key={index}>{plan}</ListItem>
-            ))}
-          </List>
-        </SectionContent>
-      </Section>
+              <SubHeading>Monitoring Plan</SubHeading>
+              <List>
+                {management.monitoringPlan.map((plan, index) => (
+                  <ListItem key={index}>{plan}</ListItem>
+                ))}
+              </List>
+            </SectionContent>
+          </Section>
+        </RightColumn>
+      </TwoColumnLayout>
     </DiagnosticContainer>
   );
 };

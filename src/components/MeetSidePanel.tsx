@@ -11,6 +11,8 @@ const SidePanelContainer = styled.div`
   flex-direction: column;
   gap: 16px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-y: auto;
+  overflow-x: hidden;
 `;
 
 const Title = styled.h2`
