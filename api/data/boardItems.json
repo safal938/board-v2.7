@@ -3,7 +3,7 @@
     "id": "dashboard-item-1759853783245-patient-context",
     "type": "component",
     "x": 100,
-    "y": 100,
+    "y": 3600,
     "width": 1600,
     "height": "auto",
     "componentType": "PatientContext",
@@ -84,7 +84,7 @@
     "id": "dashboard-item-1759906076097-medication-timeline",
     "type": "component",
     "x": 1750,
-    "y": 100,
+    "y": 3600,
     "width": 1600,
     "height": "auto",
     "componentType": "MedicationTimeline",
@@ -209,7 +209,7 @@
     "id": "dashboard-item-1759906219477-adverse-event-analytics",
     "type": "component",
     "x": 100,
-    "y": 700,
+    "y": 4200,
     "width": 1600,
     "height": "auto",
     "componentType": "AdverseEventAnalytics",
@@ -242,14 +242,107 @@
               "description": "Synergistic hepatotoxicity with TMP-SMX; oral mucosal ulcerations present"
             }
           ],
-          "riskAssessment": {
-            "keyRiskFactors": [
-              "The patient developed acute jaundice, confusion, and hepatic tenderness shortly after initiating TMP-SMX (started June 15; symptoms June 20; presentation June 21), a timeline that strongly fits idiosyncratic hepatocellular DILI",
-              "Mechanistically, TMP-SMX can raise free methotrexate levels and impair folate metabolism; in an older patient with alcohol use (and possible CKD), this pharmacologic interaction plausibly potentiates hepatocellular necrosis",
-              "The clinical pattern is hepatocellular (expected ALT > AST ≫ ALP) and the presence of encephalopathy with presumed INR >1.5 and elevated bilirubin meets criteria for non-acetaminophen acute liver failure",
-              "RUCAM totals 7 (Probable), with TMP-SMX as the primary culprit and methotrexate as a significant co-factor",
-              "Immediate management includes withdrawal of both agents, initiation of N-acetylcysteine, aggressive supportive care, and ICU-level monitoring"
-            ]
+          "rucam_ctcae_analysis": {
+            "rucam": {
+              "title": "RUCAM Scoring (Hepatocellular pattern)",
+              "columns": [
+                "#",
+                "Parameter",
+                "Key findings from this case",
+                "Score",
+                "Explanation"
+              ],
+              "rows": [
+                [
+                  "1",
+                  "Time to onset (from drug start to injury)",
+                  "TMP-SMX started Jun 15 → symptoms Jun 20 → presentation Jun 21 (≈6 days)",
+                  "+2",
+                  "Compatible interval for idiosyncratic hepatocellular DILI (5–90 days)."
+                ],
+                [
+                  "2",
+                  "Course after stopping the drug",
+                  "TMP-SMX and MTX held on admission; recovery not yet documented but improvement expected",
+                  "+1",
+                  "Early improvement expected; data incomplete at time of scoring."
+                ],
+                [
+                  "3",
+                  "Risk factors",
+                  "Age 53 (+1); chronic alcohol consumption (+1)",
+                  "+2",
+                  "Age >55 and ongoing alcohol use increase risk."
+                ],
+                [
+                  "4",
+                  "Concomitant drugs",
+                  "Methotrexate (hepatotoxic; interacts with TMP-SMX)",
+                  "-1",
+                  "Confounding co-drug complicates attribution."
+                ],
+                [
+                  "5",
+                  "Exclusion of non-drug causes",
+                  "Viral hepatitis pending; no history/exposure; ultrasound ordered; no ischemic/septic event",
+                  "+1",
+                  "Alternatives considered and largely excluded clinically."
+                ],
+                [
+                  "6",
+                  "Previous information on hepatotoxicity",
+                  "Methotrexate and TMP-SMX both well-known for hepatotoxicity and interaction",
+                  "+2",
+                  "Documented reactions in literature/databases."
+                ],
+                [
+                  "7",
+                  "Response to re-exposure",
+                  "Not applicable (no re-challenge)",
+                  "0",
+                  "—"
+                ]
+              ],
+              "total_score": 7,
+              "causality_category": "Probable"
+            },
+            "ctcae": {
+              "title": "CTCAE Hepatic Toxicity Scoring",
+              "columns": [
+                "Criterion",
+                "Observed / Inferred",
+                "CTCAE Grade",
+                "Explanation"
+              ],
+              "rows": [
+                [
+                  "ALT/AST",
+                  "Markedly elevated (likely >20× ULN)",
+                  "4",
+                  "ALT/AST >20× ULN → life-threatening elevation."
+                ],
+                [
+                  "Total Bilirubin",
+                  "Jaundice evident (likely ≥3× ULN; ~≥3 mg/dL)",
+                  "3–4",
+                  "Hyperbilirubinemia with clinical jaundice."
+                ],
+                [
+                  "INR / Coagulopathy",
+                  "Rising INR; impaired synthetic function",
+                  "4",
+                  "Coagulopathy (± encephalopathy) consistent with acute liver failure."
+                ],
+                [
+                  "Clinical Presentation",
+                  "Jaundice, asterixis, disorientation (hepatic encephalopathy)",
+                  "4",
+                  "Life-threatening consequences; urgent intervention needed."
+                ]
+              ],
+              "overall_grade": "CTCAE Grade 4 — Life-threatening; requires urgent intervention"
+            },
+            "reasoning": "The patient developed acute jaundice, confusion, and hepatic tenderness shortly after initiating TMP-SMX (started June 15; symptoms June 20; presentation June 21), a timeline that strongly fits idiosyncratic hepatocellular DILI. There is low likelihood of alternative causes—no fever or hemodynamic instability to suggest ischemic or septic hepatitis, viral panels are pending with low pretest probability, and there is no autoimmune or metabolic history. Mechanistically, TMP-SMX can raise free methotrexate levels and impair folate metabolism; in an older patient with alcohol use (and possible CKD), this pharmacologic interaction plausibly potentiates hepatocellular necrosis and explains concurrent mucosal/CNS findings. The clinical pattern is hepatocellular (expected ALT > AST ≫ ALP) and the presence of encephalopathy with presumed INR >1.5 and elevated bilirubin meets criteria for non-acetaminophen acute liver failure. RUCAM totals 7 (Probable), with TMP-SMX as the primary culprit and methotrexate as a significant co-factor. Immediate management includes withdrawal of both agents, initiation of N-acetylcysteine, aggressive supportive care, and ICU-level monitoring."
           }
         }
       }
@@ -261,7 +354,7 @@
     "id": "dashboard-item-1759906246155-lab-table",
     "type": "component",
     "x": 1750,
-    "y": 900,
+    "y": 4400,
     "width": 520,
     "height": 500,
     "componentType": "LabTable",
@@ -329,7 +422,7 @@
     "id": "dashboard-item-1759906246156-lab-chart",
     "type": "component",
     "x": 2300,
-    "y": 900,
+    "y": 4400,
     "width": 520,
     "height": 500,
     "componentType": "LabChart",
@@ -419,7 +512,7 @@
     "id": "dashboard-item-1759906246157-differential-diagnosis",
     "type": "component",
     "x": 2850,
-    "y": 900,
+    "y": 4400,
     "width": 520,
     "height": 500,
     "componentType": "DifferentialDiagnosis",
@@ -468,8 +561,8 @@
   {
     "id": "dashboard-item-1759906300003-single-encounter-1",
     "type": "component",
-    "x": 100,
-    "y": -1200,
+    "x": -300,
+    "y": 650,
     "width": 400,
     "height": 500,
     "componentType": "SingleEncounterDocument",
@@ -549,8 +642,8 @@
   {
     "id": "dashboard-item-1759906300004-single-encounter-2",
     "type": "component",
-    "x": 600,
-    "y": -1200,
+    "x": 300,
+    "y": 1000,
     "width": 500,
     "height": 600,
     "componentType": "SingleEncounterDocument",
@@ -636,8 +729,8 @@
   {
     "id": "dashboard-item-1759906300004-single-encounter-3",
     "type": "component",
-    "x": 1200,
-    "y": -1200,
+    "x": 1000,
+    "y": 650,
     "width": 500,
     "height": 600,
     "componentType": "SingleEncounterDocument",
@@ -738,8 +831,8 @@
   {
     "id": "dashboard-item-1759906300004-single-encounter-4",
     "type": "component",
-    "x": 1800,
-    "y": -1200,
+    "x": 1700,
+    "y": 1000,
     "width": 500,
     "height": 600,
     "componentType": "SingleEncounterDocument",
@@ -834,7 +927,7 @@
     "id": "dashboard-item-1759906300004-single-encounter-5",
     "type": "component",
     "x": 2400,
-    "y": -1200,
+    "y": 650,
     "width": 500,
     "height": 600,
     "componentType": "SingleEncounterDocument",
@@ -926,8 +1019,8 @@
   {
     "id": "dashboard-item-1759906300004-single-encounter-6",
     "type": "component",
-    "x": 3000,
-    "y": -1200,
+    "x": 3100,
+    "y": 1000,
     "width": 500,
     "height": 600,
     "componentType": "SingleEncounterDocument",
@@ -1017,8 +1110,8 @@
   {
     "id": "raw-nervecentre-encounter-1",
     "type": "component",
-    "x": -1300,
-    "y": -2800,
+    "x": -2250,
+    "y": -4700,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1043,8 +1136,8 @@
   {
     "id": "raw-nervecentre-encounter-2",
     "type": "component",
-    "x": -750,
-    "y": -2800,
+    "x": -1650,
+    "y": -4700,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1067,8 +1160,8 @@
   {
     "id": "raw-nervecentre-encounter-3",
     "type": "component",
-    "x": -200,
-    "y": -2800,
+    "x": -1050,
+    "y": -4700,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1091,8 +1184,8 @@
   {
     "id": "raw-nervecentre-encounter-4",
     "type": "component",
-    "x": 350,
-    "y": -2800,
+    "x": -450,
+    "y": -4700,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1115,8 +1208,8 @@
   {
     "id": "raw-nervecentre-encounter-5",
     "type": "component",
-    "x": 900,
-    "y": -2800,
+    "x": 150,
+    "y": -4700,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1139,8 +1232,8 @@
   {
     "id": "raw-nervecentre-encounter-6",
     "type": "component",
-    "x": 1450,
-    "y": -2800,
+    "x": 750,
+    "y": -4700,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1165,8 +1258,8 @@
   {
     "id": "raw-medilogik-ems-colonoscopy",
     "type": "component",
-    "x": -1300,
-    "y": -3600,
+    "x": 850,
+    "y": -2600,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1191,8 +1284,8 @@
   {
     "id": "raw-viper-ultrasound-ivc",
     "type": "component",
-    "x": -500,
-    "y": -3600,
+    "x": 160,
+    "y": -2600,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1217,8 +1310,8 @@
   {
     "id": "raw-bighand-dictation-hayes-2015",
     "type": "component",
-    "x": -1300,
-    "y": -3600,
+    "x": 1600,
+    "y": -4700,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1243,8 +1336,8 @@
   {
     "id": "raw-bighand-dictation-green-2021",
     "type": "component",
-    "x": -650,
-    "y": -3600,
+    "x": 2175,
+    "y": -4700,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1269,8 +1362,8 @@
   {
     "id": "raw-bighand-dictation-chen-2025",
     "type": "component",
-    "x": 0,
-    "y": -3600,
+    "x": 2750,
+    "y": -4700,
     "width": 480,
     "height": 700,
     "componentType": "RawClinicalNote",
@@ -1295,8 +1388,8 @@
   {
     "id": "raw-ice-lab-data-encounter-1",
     "type": "component",
-    "x": -1300,
-    "y": -4300,
+    "x": -2300,
+    "y": -2600,
     "width": 400,
     "height": 600,
     "componentType": "ICELabData",
@@ -1433,8 +1526,8 @@
   {
     "id": "raw-ice-lab-data-encounter-2",
     "type": "component",
-    "x": -850,
-    "y": -4300,
+    "x": -1850,
+    "y": -2600,
     "width": 400,
     "height": 600,
     "componentType": "ICELabData",
@@ -1522,8 +1615,8 @@
   {
     "id": "raw-ice-lab-data-encounter-3",
     "type": "component",
-    "x": -400,
-    "y": -4300,
+    "x": -1400,
+    "y": -2600,
     "width": 400,
     "height": 600,
     "componentType": "ICELabData",
@@ -1611,8 +1704,8 @@
   {
     "id": "raw-ice-lab-data-encounter-5",
     "type": "component",
-    "x": 50,
-    "y": -4300,
+    "x": -950,
+    "y": -2600,
     "width": 400,
     "height": 600,
     "componentType": "ICELabData",
@@ -1709,8 +1802,8 @@
   {
     "id": "raw-ice-lab-data-encounter-6",
     "type": "component",
-    "x": 500,
-    "y": -4300,
+    "x": -500,
+    "y": -2600,
     "width": 400,
     "height": 600,
     "componentType": "ICELabData",
@@ -1887,8 +1980,8 @@
   {
     "id": "iframe-item-easl-interface",
     "type": "iframe",
-    "x": -2100,
-    "y": 100,
+    "x": 8100,
+    "y": 600,
     "width": 1800,
     "height": 1200,
     "title": "EASL Web Interface",
@@ -1899,47 +1992,19 @@
     "createdAt": "2025-10-28T12:00:00.000Z",
     "updatedAt": "2025-10-28T12:00:00.000Z"
   },
+
   {
     "id": "ehr-hub-nervecentre",
     "type": "ehrHub",
-    "x": -1200,
+    "x": -2400,
     "y": -5400,
     "width": 350,
     "height": 250,
     "data": {
       "label": "Nervecentre EPR",
       "count": 6,
-      "description": "Primary EPR system for clinical encounters"
-    },
-    "createdAt": "2025-11-06T12:00:00.000Z",
-    "updatedAt": "2025-11-06T12:00:00.000Z"
-  },
-  {
-    "id": "ehr-hub-ice",
-    "type": "ehrHub",
-    "x": -750,
-    "y": -5400,
-    "width": 350,
-    "height": 250,
-    "data": {
-      "label": "ICE Laboratory",
-      "count": 6,
-      "description": "Laboratory information system"
-    },
-    "createdAt": "2025-11-06T12:00:00.000Z",
-    "updatedAt": "2025-11-06T12:00:00.000Z"
-  },
-  {
-    "id": "ehr-hub-bighand",
-    "type": "ehrHub",
-    "x": -300,
-    "y": -5400,
-    "width": 350,
-    "height": 250,
-    "data": {
-      "label": "BigHand Dictation",
-      "count": 3,
-      "description": "Clinical dictation and transcription"
+      "description": "Primary EPR system for clinical encounters",
+      "color": "#9C27b0"
     },
     "createdAt": "2025-11-06T12:00:00.000Z",
     "updatedAt": "2025-11-06T12:00:00.000Z"
@@ -1947,14 +2012,15 @@
   {
     "id": "ehr-hub-medilogik",
     "type": "ehrHub",
-    "x": -1200,
-    "y": -5000,
-    "width": 300,
-    "height": 200,
+    "x": 600,
+    "y": -3350,
+    "width": 350,
+    "height": 250,
     "data": {
       "label": "Medilogik EMS",
       "count": 1,
-      "description": "Endoscopy management system"
+      "description": "Endoscopy management system",
+      "color": "#00BCd4"
     },
     "createdAt": "2025-11-06T12:00:00.000Z",
     "updatedAt": "2025-11-06T12:00:00.000Z"
@@ -1962,14 +2028,47 @@
   {
     "id": "ehr-hub-viper",
     "type": "ehrHub",
-    "x": -800,
-    "y": -5000,
-    "width": 300,
-    "height": 200,
+    "x": -200,
+    "y": -3350,
+    "width": 350,
+    "height": 250,
     "data": {
       "label": "VIPER Ultrasound",
       "count": 1,
-      "description": "Point-of-care ultrasound"
+      "description": "Point-of-care ultrasound",
+      "color": "#FF5722"
+    },
+    "createdAt": "2025-11-06T12:00:00.000Z",
+    "updatedAt": "2025-11-06T12:00:00.000Z"
+  },
+  {
+    "id": "ehr-hub-ice",
+    "type": "ehrHub",
+    "x": -2400,
+    "y": -3350,
+    "width": 350,
+    "height": 250,
+    "data": {
+      "label": "ICE Laboratory",
+      "count": 5,
+      "description": "Laboratory information system",
+      "color": "#2196F3"
+    },
+    "createdAt": "2025-11-06T12:00:00.000Z",
+    "updatedAt": "2025-11-06T12:00:00.000Z"
+  },
+  {
+    "id": "ehr-hub-bighand",
+    "type": "ehrHub",
+    "x": 1500,
+    "y": -5400,
+    "width": 350,
+    "height": 250,
+    "data": {
+      "label": "BigHand Dictation",
+      "count": 3,
+      "description": "Clinical dictation and transcription",
+      "color": "#4caf50"
     },
     "createdAt": "2025-11-06T12:00:00.000Z",
     "updatedAt": "2025-11-06T12:00:00.000Z"
@@ -1977,33 +2076,34 @@
   {
     "id": "subzone-nervecentre",
     "type": "zone",
-    "x": -1400,
-    "y": -2900,
-    "width": 3500,
-    "height": 850,
+    "x": -2350,
+    "y": -4800,
+    "width": 3700,
+    "height": 1100,
     "data": {
       "label": "Nervecentre EPR Data",
-      "color": "#f59e0b",
+       "color": "#3b82f6",
       "handlePosition": "top"
     },
     "style": {
-      "background": "linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(245, 158, 11, 0.12) 100%)",
-      "border": "2px solid #f59e0b",
-      "borderRadius": "12px"
+      "background": "linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.12) 100%)",
+      "border": "2px solid #3b82f6",
+      "borderRadius": "12px",
+      "pointerEvents": "none"
     },
     "draggable": false,
     "selectable": false,
-    "zIndex": -1,
+    "zIndex": -2,
     "createdAt": "2025-11-06T14:00:00.000Z",
     "updatedAt": "2025-11-06T14:00:00.000Z"
   },
   {
     "id": "subzone-ice",
     "type": "zone",
-    "x": -1400,
-    "y": -4400,
-    "width": 2800,
-    "height": 850,
+    "x": -2400,
+    "y": -2700,
+    "width": 2400,
+    "height": 900,
     "data": {
       "label": "ICE Laboratory Data",
       "color": "#3b82f6",
@@ -2012,81 +2112,233 @@
     "style": {
       "background": "linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.12) 100%)",
       "border": "2px solid #3b82f6",
-      "borderRadius": "12px"
+      "borderRadius": "12px",
+      "pointerEvents": "none"
     },
     "draggable": false,
     "selectable": false,
-    "zIndex": -1,
+    "zIndex": -2,
     "createdAt": "2025-11-06T14:00:00.000Z",
     "updatedAt": "2025-11-06T14:00:00.000Z"
   },
   {
     "id": "subzone-bighand",
     "type": "zone",
-    "x": -1400,
-    "y": -3700,
-    "width": 2200,
-    "height": 850,
+    "x": 1500,
+    "y": -4800,
+    "width": 1800,
+    "height": 900,
     "data": {
       "label": "BigHand Dictation Data",
-      "color": "#10b981",
+      "color": "#3b82f6",
       "handlePosition": "top"
     },
     "style": {
-      "background": "linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.12) 100%)",
-      "border": "2px solid #10b981",
-      "borderRadius": "12px"
+      "background": "linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.12) 100%)",
+      "border": "2px solid #3b82f6",
+      "borderRadius": "12px",
+      "pointerEvents": "none"
     },
     "draggable": false,
     "selectable": false,
-    "zIndex": -1,
+    "zIndex": -2,
     "createdAt": "2025-11-06T14:00:00.000Z",
     "updatedAt": "2025-11-06T14:00:00.000Z"
   },
   {
     "id": "subzone-medilogik",
     "type": "zone",
-    "x": -1400,
-    "y": -3700,
-    "width": 700,
-    "height": 850,
+    "x": 800,
+    "y": -2700,
+    "width": 600,
+    "height": 900,
     "data": {
       "label": "Medilogik EMS Data",
-      "color": "#8b5cf6",
+      "color": "#3b82f6",
       "handlePosition": "top"
     },
     "style": {
-      "background": "linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0.12) 100%)",
-      "border": "2px solid #8b5cf6",
-      "borderRadius": "12px"
+      "background": "linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.12) 100%)",
+      "border": "2px solid #3b82f6",
+      "borderRadius": "12px",
+      "pointerEvents": "none"
     },
     "draggable": false,
     "selectable": false,
-    "zIndex": -1,
+    "zIndex": -2,
     "createdAt": "2025-11-06T14:00:00.000Z",
     "updatedAt": "2025-11-06T14:00:00.000Z"
   },
   {
     "id": "subzone-viper",
     "type": "zone",
-    "x": -600,
-    "y": -3700,
-    "width": 700,
-    "height": 850,
+    "x": 100,
+    "y": -2700,
+    "width": 600,
+    "height": 900,
     "data": {
       "label": "VIPER Ultrasound Data",
-      "color": "#ec4899",
+       "color": "#3b82f6",
       "handlePosition": "top"
     },
     "style": {
-      "background": "linear-gradient(135deg, rgba(236, 72, 153, 0.08) 0%, rgba(236, 72, 153, 0.12) 100%)",
-      "border": "2px solid #ec4899",
-      "borderRadius": "12px"
+      "background": "linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.12) 100%)",
+      "border": "2px solid #3b82f6",
+      "borderRadius": "12px",
+      "pointerEvents": "none"
     },
     "draggable": false,
     "selectable": false,
-    "zIndex": -1,
+    "zIndex": -2,
     "createdAt": "2025-11-06T14:00:00.000Z",
     "updatedAt": "2025-11-06T14:00:00.000Z"
+  },
+  {
+    "id": "dashboard-item-dili-diagnostic",
+    "type": "component",
+    "x": 200,
+    "y": 6100,
+    "width": 1800,
+    "height": "auto",
+    "componentType": "DILIDiagnostic",
+    "color": "#ffffff",
+    "description": "Structured diagnostic reasoning for suspected Drug-Induced Liver Injury (DILI)",
+    "content": {
+      "title": "DILI Diagnostic Panel",
+      "component": "DILIDiagnostic",
+      "props": {
+        "pattern": {
+          "classification": "Hepatocellular",
+          "R_ratio": 12.4,
+          "keyLabs": [
+            { "label": "ALT", "value": "1650 U/L", "note": "↑↑" },
+            { "label": "AST", "value": "2100 U/L", "note": "↑↑" },
+            { "label": "ALP", "value": "350 U/L", "note": "mild ↑" },
+            { "label": "Total Bilirubin", "value": "12.5 mg/dL", "note": "↑" },
+            { "label": "INR", "value": "1.0", "note": "Coagulopathy noted in summary (INR elevated), but this specific lab shows 1.0. Typically, INR >1.5 in ALF" }
+          ],
+          "clinicalFeatures": [
+            "Asterixis present (suggests hepatic encephalopathy)",
+            "Jaundice",
+            "Epigastric pain",
+            "Confusion",
+            "Severe fatigue",
+            "Mouth ulcers"
+          ]
+        },
+        "causality": {
+          "primaryDrug": "Trimethoprim-Sulfamethoxazole (TMP-SMX)",
+          "contributingFactors": [
+            "Chronic Methotrexate use at 20 mg weekly",
+            "Age 63 years",
+            "Mild Chronic Kidney Disease (reduced MTX clearance)",
+            "Alcohol intake (~7–14 units/week)"
+          ],
+          "mechanisticRationale": [
+            "TMP-SMX inhibits dihydrofolate reductase and displaces MTX from protein binding, increasing free MTX levels and impairing folate metabolism, thereby amplifying MTX toxicity.",
+            "Accumulated MTX due to impaired renal clearance (CKD) contributes to hepatocyte injury and systemic toxicity.",
+            "Latency of 5–6 days from TMP-SMX initiation to symptom onset is typical for idiosyncratic hepatocellular DILI and acute drug-drug interactions."
+          ]
+        },
+        "severity": {
+          "features": [
+            "Diagnosis of Acute Liver Failure (GCS 13, encephalopathy, significant transaminitis, hyperbilirubinemia).",
+            "Hepatic encephalopathy (Grade 4) indicated by asterixis and disorientation.",
+            "Risk of pancytopenia due to severe methotrexate toxicity."
+          ],
+          "prognosis": "Critically ill patient requiring intensive care and urgent management to prevent further deterioration and potential need for liver transplant."
+        },
+        "management": {
+          "immediateActions": [
+            "Immediately cease Methotrexate (MTX).",
+            "Immediately cease Trimethoprim-Sulfamethoxazole (TMP-SMX).",
+            "Initiate IV N-acetylcysteine protocol.",
+            "Admit to Intensive Care Unit (ICU) for continuous monitoring of neurological status, coagulation, and vital signs."
+          ],
+          "consults": [
+            "Hepatology (urgent consultation for liver failure management).",
+            "Hematology (for evaluation and management of potential pancytopenia/methotrexate toxicity).",
+            "Nephrology (given pre-existing CKD and potential renal involvement)."
+          ],
+          "monitoringPlan": [
+            "Repeat Liver Function Tests (LFTs), INR, and Ammonia levels every 4–6 hours.",
+            "Frequent neurological status checks (e.g., every 2 hours).",
+            "Monitor complete blood count for pancytopenia.",
+            "Monitor renal function (creatinine, eGFR, urine output)."
+          ]
+        }
+      }
+    },
+    "createdAt": "2025-11-10T15:34:00.000Z",
+    "updatedAt": "2025-11-10T15:34:00.000Z"
+  },
+  {
+    "id": "dashboard-item-generate-report-button",
+    "type": "button",
+    "x": 700,
+    "y": 7350,
+    "width": 600,
+    "height": 50,
+    "buttonText": "Share Patient's Board to Hepato",
+    "buttonIcon": "📄",
+    "buttonColor": "#1E88E5",
+    "buttonAction": "generateReport",
+    "createdAt": "2025-11-10T16:00:00.000Z",
+    "updatedAt": "2025-11-10T16:00:00.000Z"
+  },
+  {
+    "id": "dashboard-item-patient-report",
+    "type": "component",
+    "x": 200,
+    "y": 7500,
+    "width": 1800,
+    "height": "auto",
+    "componentType": "PatientReport",
+    "color": "#ffffff",
+    "description": "Comprehensive patient summary report",
+    "content": {
+      "title": "Patient Summary Report",
+      "component": "PatientReport",
+      "props": {
+        "patientData": {
+          "name": "Sarah Miller",
+          "date_of_birth": "1962-03-15",
+          "age": 63,
+          "sex": "Female",
+          "mrn": "MC-001001",
+          "primaryDiagnosis": "Rheumatoid arthritis",
+          "problem_list": [
+            { "name": "Rheumatoid arthritis", "status": "active" },
+            { "name": "Essential hypertension", "status": "active" },
+            { "name": "Mild chronic kidney disease", "status": "active" }
+          ],
+          "allergies": [
+            "Penicillin (rash)"
+          ],
+          "medication_history": [
+            { "name": "Methotrexate", "dose": "10 mg weekly (2015-2018), then 20 mg weekly (2018-2025)" },
+            { "name": "Folic Acid", "dose": "5 mg weekly (since 2015)" },
+            { "name": "Lisinopril", "dose": "10 mg daily (since 2018)" }
+          ],
+          "acute_event_summary": "On June 15, 2025, Sarah was prescribed Trimethoprim-Sulfamethoxazole (TMP-SMX) for acute bacterial sinusitis. Six days later, on June 21, 2025, she presented to the Emergency Department with severe fatigue, jaundice, epigastric pain, confusion, and mouth ulcers, indicative of a critical adverse drug event.",
+          "diagnosis_acute_event": [
+            "Acute Liver Injury",
+            "Acute Liver Failure",
+            "Hepatic Encephalopathy",
+            "Severe Methotrexate Toxicity"
+          ],
+          "causality": "The acute event was caused by a synergistic drug-drug interaction between Trimethoprim-Sulfamethoxazole and Methotrexate. TMP-SMX significantly increased methotrexate levels and impaired folate metabolism, leading to severe hepatocellular toxicity. Contributing factors include Sarah's age (63) and pre-existing mild chronic kidney disease.",
+          "management_recommendations": [
+            "Immediate discontinuation of Methotrexate and Trimethoprim-Sulfamethoxazole.",
+            "Initiation of N-acetylcysteine protocol.",
+            "Admission to Intensive Care Unit (ICU) for close monitoring.",
+            "Urgent consultations with Hepatology and Hematology specialists.",
+            "Comprehensive monitoring of liver function, renal function, coagulation, and neurological status."
+          ]
+        }
+      }
+    },
+    "createdAt": "2025-11-10T15:34:00.000Z",
+    "updatedAt": "2025-11-10T15:34:00.000Z"
   }
 ]

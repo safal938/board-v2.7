@@ -584,6 +584,14 @@ const DOCTORS_NOTE_ZONE = {
   height: 2100,
 };
 
+// Raw EHR Data Zone boundaries
+const RAW_EHR_DATA_ZONE = {
+  x: 1500,
+  y: -3800,
+  width: 2500,
+  height: 2400,
+};
+
 // Find position within Doctor's Notes Zone with proper spacing
 const findDoctorsNotePosition = (newItem, existingItems) => {
   const padding = 50; // Space between items and zone border
@@ -1182,7 +1190,7 @@ app.post("/api/agents", async (req, res) => {
       "doctors-note-zone": { x: 5800, y: 0, width: 2000, height: 2100 },
       "adv-event-zone": { x: 0, y: 0, width: 4000, height: 2300 },
       "data-zone": { x: 0, y: -1300, width: 4000, height: 1000 },
-      "raw-ehr-data-zone": { x: 0, y: -4600, width: 4000, height: 3000 },
+      "raw-ehr-data-zone": { x: 1500, y: -3800, width: 2500, height: 2400 },
       "web-interface-zone": { x: -2200, y: 0, width: 2000, height: 1500 },
     };
 
@@ -2252,6 +2260,65 @@ app.post("/api/reload-board-items", async (req, res) => {
     console.error("❌ Error reloading board items:", error);
     res.status(500).json({
       error: "Failed to reload board items",
+      details: error.message
+    });
+  }
+});
+
+// POST /api/redis/clear - Clear all Redis data
+app.post("/api/redis/clear", async (req, res) => {
+  try {
+    if (!isRedisConnected || !redisClient) {
+      return res.status(503).json({
+        error: "Redis not connected",
+        message: "Redis is not available"
+      });
+    }
+
+    console.log("🗑️ Clearing all Redis data...");
+    
+    // Delete the boardItems key
+    await redisClient.del("boardItems");
+    
+    console.log("✅ Redis data cleared");
+    
+    res.json({
+      success: true,
+      message: "Redis data cleared successfully"
+    });
+  } catch (error) {
+    console.error("❌ Error clearing Redis:", error);
+    res.status(500).json({
+      error: "Failed to clear Redis",
+      details: error.message
+    });
+  }
+});
+
+// GET /api/redis/info - Get Redis connection info and stats
+app.get("/api/redis/info", async (req, res) => {
+  try {
+    if (!isRedisConnected || !redisClient) {
+      return res.json({
+        connected: false,
+        message: "Redis not connected"
+      });
+    }
+
+    // Get boardItems data
+    const data = await redisClient.get("boardItems");
+    const itemCount = data ? JSON.parse(data).length : 0;
+    
+    res.json({
+      connected: true,
+      itemCount: itemCount,
+      hasData: !!data,
+      redisUrl: process.env.REDIS_URL ? "configured" : "not configured"
+    });
+  } catch (error) {
+    console.error("❌ Error getting Redis info:", error);
+    res.status(500).json({
+      error: "Failed to get Redis info",
       details: error.message
     });
   }

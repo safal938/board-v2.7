@@ -8,6 +8,8 @@ import AdverseEventAnalytics from "./dashboard/AdverseEventAnalytics";
 import LabTable from "./dashboard/LabTable";
 import LabChart from "./dashboard/LabChart";
 import DifferentialDiagnosis from "./dashboard/DifferentialDiagnosis";
+import DILIDiagnostic from "./dashboard/DILIDiagnostic";
+import PatientReport from "./dashboard/PatientReport";
 import EHRSystemComponent from "./encounters/EHRSystemComponent";
 import EncounterDocument from "./encounters/EncounterDocument";
 import SingleEncounterDocument from "./encounters/SingleEncounterDocument";
@@ -832,6 +834,21 @@ const BoardItem = ({ item, isSelected, onUpdate, onDelete, onSelect, zoom = 1 })
           case "DifferentialDiagnosis":
             return (
               <DifferentialDiagnosis patientData={componentProps.patientData} />
+            );
+
+          case "DILIDiagnostic":
+            return (
+              <DILIDiagnostic
+                pattern={componentProps.pattern}
+                causality={componentProps.causality}
+                severity={componentProps.severity}
+                management={componentProps.management}
+              />
+            );
+
+          case "PatientReport":
+            return (
+              <PatientReport patientData={componentProps.patientData} />
             );
 
           case "EHRSystemComponent":

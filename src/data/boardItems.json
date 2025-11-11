@@ -242,14 +242,107 @@
               "description": "Synergistic hepatotoxicity with TMP-SMX; oral mucosal ulcerations present"
             }
           ],
-          "riskAssessment": {
-            "keyRiskFactors": [
-              "The patient developed acute jaundice, confusion, and hepatic tenderness shortly after initiating TMP-SMX (started June 15; symptoms June 20; presentation June 21), a timeline that strongly fits idiosyncratic hepatocellular DILI",
-              "Mechanistically, TMP-SMX can raise free methotrexate levels and impair folate metabolism; in an older patient with alcohol use (and possible CKD), this pharmacologic interaction plausibly potentiates hepatocellular necrosis",
-              "The clinical pattern is hepatocellular (expected ALT > AST ≫ ALP) and the presence of encephalopathy with presumed INR >1.5 and elevated bilirubin meets criteria for non-acetaminophen acute liver failure",
-              "RUCAM totals 7 (Probable), with TMP-SMX as the primary culprit and methotrexate as a significant co-factor",
-              "Immediate management includes withdrawal of both agents, initiation of N-acetylcysteine, aggressive supportive care, and ICU-level monitoring"
-            ]
+          "rucam_ctcae_analysis": {
+            "rucam": {
+              "title": "RUCAM Scoring (Hepatocellular pattern)",
+              "columns": [
+                "#",
+                "Parameter",
+                "Key findings from this case",
+                "Score",
+                "Explanation"
+              ],
+              "rows": [
+                [
+                  "1",
+                  "Time to onset (from drug start to injury)",
+                  "TMP-SMX started Jun 15 → symptoms Jun 20 → presentation Jun 21 (≈6 days)",
+                  "+2",
+                  "Compatible interval for idiosyncratic hepatocellular DILI (5–90 days)."
+                ],
+                [
+                  "2",
+                  "Course after stopping the drug",
+                  "TMP-SMX and MTX held on admission; recovery not yet documented but improvement expected",
+                  "+1",
+                  "Early improvement expected; data incomplete at time of scoring."
+                ],
+                [
+                  "3",
+                  "Risk factors",
+                  "Age 53 (+1); chronic alcohol consumption (+1)",
+                  "+2",
+                  "Age >55 and ongoing alcohol use increase risk."
+                ],
+                [
+                  "4",
+                  "Concomitant drugs",
+                  "Methotrexate (hepatotoxic; interacts with TMP-SMX)",
+                  "-1",
+                  "Confounding co-drug complicates attribution."
+                ],
+                [
+                  "5",
+                  "Exclusion of non-drug causes",
+                  "Viral hepatitis pending; no history/exposure; ultrasound ordered; no ischemic/septic event",
+                  "+1",
+                  "Alternatives considered and largely excluded clinically."
+                ],
+                [
+                  "6",
+                  "Previous information on hepatotoxicity",
+                  "Methotrexate and TMP-SMX both well-known for hepatotoxicity and interaction",
+                  "+2",
+                  "Documented reactions in literature/databases."
+                ],
+                [
+                  "7",
+                  "Response to re-exposure",
+                  "Not applicable (no re-challenge)",
+                  "0",
+                  "—"
+                ]
+              ],
+              "total_score": 7,
+              "causality_category": "Probable"
+            },
+            "ctcae": {
+              "title": "CTCAE Hepatic Toxicity Scoring",
+              "columns": [
+                "Criterion",
+                "Observed / Inferred",
+                "CTCAE Grade",
+                "Explanation"
+              ],
+              "rows": [
+                [
+                  "ALT/AST",
+                  "Markedly elevated (likely >20× ULN)",
+                  "4",
+                  "ALT/AST >20× ULN → life-threatening elevation."
+                ],
+                [
+                  "Total Bilirubin",
+                  "Jaundice evident (likely ≥3× ULN; ~≥3 mg/dL)",
+                  "3–4",
+                  "Hyperbilirubinemia with clinical jaundice."
+                ],
+                [
+                  "INR / Coagulopathy",
+                  "Rising INR; impaired synthetic function",
+                  "4",
+                  "Coagulopathy (± encephalopathy) consistent with acute liver failure."
+                ],
+                [
+                  "Clinical Presentation",
+                  "Jaundice, asterixis, disorientation (hepatic encephalopathy)",
+                  "4",
+                  "Life-threatening consequences; urgent intervention needed."
+                ]
+              ],
+              "overall_grade": "CTCAE Grade 4 — Life-threatening; requires urgent intervention"
+            },
+            "reasoning": "The patient developed acute jaundice, confusion, and hepatic tenderness shortly after initiating TMP-SMX (started June 15; symptoms June 20; presentation June 21), a timeline that strongly fits idiosyncratic hepatocellular DILI. There is low likelihood of alternative causes—no fever or hemodynamic instability to suggest ischemic or septic hepatitis, viral panels are pending with low pretest probability, and there is no autoimmune or metabolic history. Mechanistically, TMP-SMX can raise free methotrexate levels and impair folate metabolism; in an older patient with alcohol use (and possible CKD), this pharmacologic interaction plausibly potentiates hepatocellular necrosis and explains concurrent mucosal/CNS findings. The clinical pattern is hepatocellular (expected ALT > AST ≫ ALP) and the presence of encephalopathy with presumed INR >1.5 and elevated bilirubin meets criteria for non-acetaminophen acute liver failure. RUCAM totals 7 (Probable), with TMP-SMX as the primary culprit and methotrexate as a significant co-factor. Immediate management includes withdrawal of both agents, initiation of N-acetylcysteine, aggressive supportive care, and ICU-level monitoring."
           }
         }
       }
@@ -2099,5 +2192,153 @@
     "zIndex": -2,
     "createdAt": "2025-11-06T14:00:00.000Z",
     "updatedAt": "2025-11-06T14:00:00.000Z"
+  },
+  {
+    "id": "dashboard-item-dili-diagnostic",
+    "type": "component",
+    "x": 1000,
+    "y": 6100,
+    "width": 1800,
+    "height": "auto",
+    "componentType": "DILIDiagnostic",
+    "color": "#ffffff",
+    "description": "Structured diagnostic reasoning for suspected Drug-Induced Liver Injury (DILI)",
+    "content": {
+      "title": "DILI Diagnostic Panel",
+      "component": "DILIDiagnostic",
+      "props": {
+        "pattern": {
+          "classification": "Hepatocellular",
+          "R_ratio": 12.4,
+          "keyLabs": [
+            { "label": "ALT", "value": "1650 U/L", "note": "↑↑" },
+            { "label": "AST", "value": "2100 U/L", "note": "↑↑" },
+            { "label": "ALP", "value": "350 U/L", "note": "mild ↑" },
+            { "label": "Total Bilirubin", "value": "12.5 mg/dL", "note": "↑" },
+            { "label": "INR", "value": "1.0", "note": "Coagulopathy noted in summary (INR elevated), but this specific lab shows 1.0. Typically, INR >1.5 in ALF" }
+          ],
+          "clinicalFeatures": [
+            "Asterixis present (suggests hepatic encephalopathy)",
+            "Jaundice",
+            "Epigastric pain",
+            "Confusion",
+            "Severe fatigue",
+            "Mouth ulcers"
+          ]
+        },
+        "causality": {
+          "primaryDrug": "Trimethoprim-Sulfamethoxazole (TMP-SMX)",
+          "contributingFactors": [
+            "Chronic Methotrexate use at 20 mg weekly",
+            "Age 63 years",
+            "Mild Chronic Kidney Disease (reduced MTX clearance)",
+            "Alcohol intake (~7–14 units/week)"
+          ],
+          "mechanisticRationale": [
+            "TMP-SMX inhibits dihydrofolate reductase and displaces MTX from protein binding, increasing free MTX levels and impairing folate metabolism, thereby amplifying MTX toxicity.",
+            "Accumulated MTX due to impaired renal clearance (CKD) contributes to hepatocyte injury and systemic toxicity.",
+            "Latency of 5–6 days from TMP-SMX initiation to symptom onset is typical for idiosyncratic hepatocellular DILI and acute drug-drug interactions."
+          ]
+        },
+        "severity": {
+          "features": [
+            "Diagnosis of Acute Liver Failure (GCS 13, encephalopathy, significant transaminitis, hyperbilirubinemia).",
+            "Hepatic encephalopathy (Grade 4) indicated by asterixis and disorientation.",
+            "Risk of pancytopenia due to severe methotrexate toxicity."
+          ],
+          "prognosis": "Critically ill patient requiring intensive care and urgent management to prevent further deterioration and potential need for liver transplant."
+        },
+        "management": {
+          "immediateActions": [
+            "Immediately cease Methotrexate (MTX).",
+            "Immediately cease Trimethoprim-Sulfamethoxazole (TMP-SMX).",
+            "Initiate IV N-acetylcysteine protocol.",
+            "Admit to Intensive Care Unit (ICU) for continuous monitoring of neurological status, coagulation, and vital signs."
+          ],
+          "consults": [
+            "Hepatology (urgent consultation for liver failure management).",
+            "Hematology (for evaluation and management of potential pancytopenia/methotrexate toxicity).",
+            "Nephrology (given pre-existing CKD and potential renal involvement)."
+          ],
+          "monitoringPlan": [
+            "Repeat Liver Function Tests (LFTs), INR, and Ammonia levels every 4–6 hours.",
+            "Frequent neurological status checks (e.g., every 2 hours).",
+            "Monitor complete blood count for pancytopenia.",
+            "Monitor renal function (creatinine, eGFR, urine output)."
+          ]
+        }
+      }
+    },
+    "createdAt": "2025-11-10T15:34:00.000Z",
+    "updatedAt": "2025-11-10T15:34:00.000Z"
+  },
+  {
+    "id": "dashboard-item-generate-report-button",
+    "type": "button",
+    "x": 1600,
+    "y": 8700,
+    "width": 600,
+    "height": 50,
+    "buttonText": "Share Patient's Board to Hepato",
+    "buttonIcon": "📄",
+    "buttonColor": "#1E88E5",
+    "buttonAction": "generateReport",
+    "createdAt": "2025-11-10T16:00:00.000Z",
+    "updatedAt": "2025-11-10T16:00:00.000Z"
+  },
+  {
+    "id": "dashboard-item-patient-report",
+    "type": "component",
+    "x": 1000,
+    "y": 9000,
+    "width": 1800,
+    "height": "auto",
+    "componentType": "PatientReport",
+    "color": "#ffffff",
+    "description": "Comprehensive patient summary report",
+    "content": {
+      "title": "Patient Summary Report",
+      "component": "PatientReport",
+      "props": {
+        "patientData": {
+          "name": "Sarah Miller",
+          "date_of_birth": "1962-03-15",
+          "age": 63,
+          "sex": "Female",
+          "mrn": "MC-001001",
+          "primaryDiagnosis": "Rheumatoid arthritis",
+          "problem_list": [
+            { "name": "Rheumatoid arthritis", "status": "active" },
+            { "name": "Essential hypertension", "status": "active" },
+            { "name": "Mild chronic kidney disease", "status": "active" }
+          ],
+          "allergies": [
+            "Penicillin (rash)"
+          ],
+          "medication_history": [
+            { "name": "Methotrexate", "dose": "10 mg weekly (2015-2018), then 20 mg weekly (2018-2025)" },
+            { "name": "Folic Acid", "dose": "5 mg weekly (since 2015)" },
+            { "name": "Lisinopril", "dose": "10 mg daily (since 2018)" }
+          ],
+          "acute_event_summary": "On June 15, 2025, Sarah was prescribed Trimethoprim-Sulfamethoxazole (TMP-SMX) for acute bacterial sinusitis. Six days later, on June 21, 2025, she presented to the Emergency Department with severe fatigue, jaundice, epigastric pain, confusion, and mouth ulcers, indicative of a critical adverse drug event.",
+          "diagnosis_acute_event": [
+            "Acute Liver Injury",
+            "Acute Liver Failure",
+            "Hepatic Encephalopathy",
+            "Severe Methotrexate Toxicity"
+          ],
+          "causality": "The acute event was caused by a synergistic drug-drug interaction between Trimethoprim-Sulfamethoxazole and Methotrexate. TMP-SMX significantly increased methotrexate levels and impaired folate metabolism, leading to severe hepatocellular toxicity. Contributing factors include Sarah's age (63) and pre-existing mild chronic kidney disease.",
+          "management_recommendations": [
+            "Immediate discontinuation of Methotrexate and Trimethoprim-Sulfamethoxazole.",
+            "Initiation of N-acetylcysteine protocol.",
+            "Admission to Intensive Care Unit (ICU) for close monitoring.",
+            "Urgent consultations with Hepatology and Hematology specialists.",
+            "Comprehensive monitoring of liver function, renal function, coagulation, and neurological status."
+          ]
+        }
+      }
+    },
+    "createdAt": "2025-11-10T15:34:00.000Z",
+    "updatedAt": "2025-11-10T15:34:00.000Z"
   }
 ]
