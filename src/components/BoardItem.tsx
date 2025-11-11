@@ -936,6 +936,23 @@ const BoardItem = ({ item, isSelected, onUpdate, onDelete, onSelect, zoom = 1 })
           />
         );
 
+      case "dili-diagnostic":
+        return (
+          <DILIDiagnostic
+            pattern={item.diliData?.pattern || {}}
+            causality={item.diliData?.causality || {}}
+            severity={item.diliData?.severity || {}}
+            management={item.diliData?.management || {}}
+          />
+        );
+
+      case "patient-report":
+        return (
+          <PatientReport
+            patientData={item.patientData || {}}
+          />
+        );
+
       case "iframe":
         return (
           <div
@@ -1178,7 +1195,9 @@ const BoardItem = ({ item, isSelected, onUpdate, onDelete, onSelect, zoom = 1 })
           item.type === "todo" ||
           item.type === "lab-result" ||
           item.type === "component" ||
-          item.type === "ehr-data"
+          item.type === "ehr-data" ||
+          item.type === "dili-diagnostic" ||
+          item.type === "patient-report"
             ? "auto"
             : item.height,
         minHeight:
@@ -1187,6 +1206,8 @@ const BoardItem = ({ item, isSelected, onUpdate, onDelete, onSelect, zoom = 1 })
           item.type === "lab-result" ||
           item.type === "component" ||
           item.type === "ehr-data" ||
+          item.type === "dili-diagnostic" ||
+          item.type === "patient-report" ||
           item.type === "image"
             ? item.height === "auto"
               ? "200px"

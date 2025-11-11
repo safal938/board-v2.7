@@ -138,6 +138,28 @@ const ViewSection = styled.div`
   }
 `;
 
+const TwoColumnLayout = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  
+  @media (max-width: 1200px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const LeftColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const RightColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
 const ViewSectionTitle = styled.h3`
   margin: 0 0 16px 0;
   font-size: 18px;
@@ -885,103 +907,111 @@ const PatientReport: React.FC<PatientReportProps> = ({ patientData }) => {
         </ActionButtons>
       </ViewHeader>
 
-      <ViewSection>
-        <ViewSectionTitle>
-          <User />
-          Patient Demographics
-        </ViewSectionTitle>
-        <ViewText>
-          <strong>Name:</strong> {patientData.name}<br/>
-          <strong>DOB:</strong> {patientData.date_of_birth}<br/>
-          <strong>Age:</strong> {patientData.age} years<br/>
-          <strong>Sex:</strong> {patientData.sex}<br/>
-          <strong>MRN:</strong> {patientData.mrn}
-        </ViewText>
-      </ViewSection>
+      <TwoColumnLayout>
+        {/* LEFT COLUMN */}
+        <LeftColumn>
+          <ViewSection>
+            <ViewSectionTitle>
+              <User />
+              Patient Demographics
+            </ViewSectionTitle>
+            <ViewText>
+              <strong>Name:</strong> {patientData.name}<br/>
+              <strong>DOB:</strong> {patientData.date_of_birth}<br/>
+              <strong>Age:</strong> {patientData.age} years<br/>
+              <strong>Sex:</strong> {patientData.sex}<br/>
+              <strong>MRN:</strong> {patientData.mrn}
+            </ViewText>
+          </ViewSection>
 
-      <ViewSection>
-        <ViewSectionTitle>
-          <Stethoscope />
-          Clinical Information
-        </ViewSectionTitle>
-        <ViewText><strong>Primary Diagnosis:</strong> {patientData.primaryDiagnosis}</ViewText>
-      </ViewSection>
+          <ViewSection>
+            <ViewSectionTitle>
+              <Stethoscope />
+              Clinical Information
+            </ViewSectionTitle>
+            <ViewText><strong>Primary Diagnosis:</strong> {patientData.primaryDiagnosis}</ViewText>
+          </ViewSection>
 
-      <ViewSection>
-        <ViewSectionTitle>
-          <ClipboardList />
-          Problem List
-        </ViewSectionTitle>
-        <ViewList>
-          {patientData.problem_list.map((problem, index) => (
-            <ViewListItem key={index}>{problem.name} ({problem.status})</ViewListItem>
-          ))}
-        </ViewList>
-      </ViewSection>
+          <ViewSection>
+            <ViewSectionTitle>
+              <ClipboardList />
+              Problem List
+            </ViewSectionTitle>
+            <ViewList>
+              {patientData.problem_list.map((problem, index) => (
+                <ViewListItem key={index}>{problem.name} ({problem.status})</ViewListItem>
+              ))}
+            </ViewList>
+          </ViewSection>
 
-      <ViewSection>
-        <ViewSectionTitle>
-          <AlertCircle />
-          Allergies
-        </ViewSectionTitle>
-        <ViewList>
-          {patientData.allergies.map((allergy, index) => (
-            <ViewListItem key={index}>{allergy}</ViewListItem>
-          ))}
-        </ViewList>
-      </ViewSection>
+          <ViewSection>
+            <ViewSectionTitle>
+              <AlertCircle />
+              Allergies
+            </ViewSectionTitle>
+            <ViewList>
+              {patientData.allergies.map((allergy, index) => (
+                <ViewListItem key={index}>{allergy}</ViewListItem>
+              ))}
+            </ViewList>
+          </ViewSection>
 
-      <ViewSection>
-        <ViewSectionTitle>
-          <Pill />
-          Medication History
-        </ViewSectionTitle>
-        <ViewList>
-          {patientData.medication_history.map((med, index) => (
-            <ViewListItem key={index}>{med.name} - {med.dose}</ViewListItem>
-          ))}
-        </ViewList>
-      </ViewSection>
+          <ViewSection>
+            <ViewSectionTitle>
+              <Pill />
+              Medication History
+            </ViewSectionTitle>
+            <ViewList>
+              {patientData.medication_history.map((med, index) => (
+                <ViewListItem key={index}>{med.name} - {med.dose}</ViewListItem>
+              ))}
+            </ViewList>
+          </ViewSection>
 
-      <ViewSection>
-        <ViewSectionTitle>
-          <Activity />
-          Acute Event Summary
-        </ViewSectionTitle>
-        <ViewText>{patientData.acute_event_summary}</ViewText>
-      </ViewSection>
+          <ViewSection>
+            <ViewSectionTitle>
+              <Activity />
+              Acute Event Summary
+            </ViewSectionTitle>
+            <ViewText>{patientData.acute_event_summary}</ViewText>
+          </ViewSection>
+        </LeftColumn>
 
-      <ViewSection>
-        <ViewSectionTitle>
-          <Stethoscope />
-          Diagnosis - Acute Event
-        </ViewSectionTitle>
-        <ViewList>
-          {patientData.diagnosis_acute_event.map((diagnosis, index) => (
-            <ViewListItem key={index}>{diagnosis}</ViewListItem>
-          ))}
-        </ViewList>
-      </ViewSection>
+        {/* RIGHT COLUMN */}
+        <RightColumn>
+          <ViewSection>
+            <ViewSectionTitle>
+              <Stethoscope />
+              Diagnosis - Acute Event
+            </ViewSectionTitle>
+            <ViewList>
+              {patientData.diagnosis_acute_event.map((diagnosis, index) => (
+                <ViewListItem key={index}>{diagnosis}</ViewListItem>
+              ))}
+            </ViewList>
+          </ViewSection>
 
-      <ViewSection>
-        <ViewSectionTitle>
-          <TrendingUp />
-          Causality Analysis
-        </ViewSectionTitle>
-        <ViewText>{patientData.causality}</ViewText>
-      </ViewSection>
+          <ViewSection>
+            <ViewSectionTitle>
+              <TrendingUp />
+              Causality Analysis
+            </ViewSectionTitle>
+            <ViewText>{patientData.causality}</ViewText>
+          </ViewSection>
 
-      <ViewSection>
-        <ViewSectionTitle>
-          <ClipboardList />
-          Management Recommendations
-        </ViewSectionTitle>
-        <ViewList>
-          {patientData.management_recommendations.map((rec, index) => (
-            <ViewListItem key={index}>{rec}</ViewListItem>
-          ))}
-        </ViewList>
-      </ViewSection>
+          <ViewSection>
+            <ViewSectionTitle>
+              <ClipboardList />
+              Management Recommendations
+            </ViewSectionTitle>
+            <ViewList>
+              {patientData.management_recommendations.map((rec, index) => (
+                <ViewListItem key={index}>{rec}</ViewListItem>
+              ))}
+            </ViewList>
+          </ViewSection>
+        </RightColumn>
+      </TwoColumnLayout>
     </ViewContainer>
   );
 };

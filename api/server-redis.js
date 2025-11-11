@@ -1191,6 +1191,7 @@ app.post("/api/agents", async (req, res) => {
       "adv-event-zone": { x: 0, y: 0, width: 4000, height: 2300 },
       "data-zone": { x: 0, y: -1300, width: 4000, height: 1000 },
       "raw-ehr-data-zone": { x: 1500, y: -3800, width: 2500, height: 2400 },
+      "dili-analysis-zone": { x: 0, y: 6000, width: 4000, height: 5500 },
       "web-interface-zone": { x: -2200, y: 0, width: 2000, height: 1500 },
     };
 
@@ -2550,6 +2551,201 @@ app.get("/api", (req, res) => {
     },
     documentation: "https://github.com/your-repo/board-v4-working",
   });
+});
+
+// POST /api/dili-diagnostic - Create a new DILI Diagnostic Panel
+app.post("/api/dili-diagnostic", async (req, res) => {
+  try {
+    console.log("🔬 POST /api/dili-diagnostic - Creating DILI Diagnostic Panel");
+
+    const { pattern, causality, severity, management, zone, x, y, width, height } = req.body || {};
+
+    // Validate required fields
+    if (!pattern || !causality || !severity || !management) {
+      return res.status(400).json({
+        error: "pattern, causality, severity, and management objects are required",
+      });
+    }
+
+    // Zone configuration mapping
+    const zoneConfig = {
+      "task-management-zone": { x: 5800, y: -2300, width: 2000, height: 2100 },
+      "retrieved-data-zone": { x: 5800, y: -4600, width: 2000, height: 2100 },
+      "doctors-note-zone": { x: 5800, y: 0, width: 2000, height: 2100 },
+      "adv-event-zone": { x: 0, y: 0, width: 4000, height: 2300 },
+      "data-zone": { x: 0, y: -1300, width: 4000, height: 1000 },
+      "raw-ehr-data-zone": { x: 1500, y: -3800, width: 2500, height: 2400 },
+      "dili-analysis-zone": { x: 0, y: 6000, width: 4000, height: 5500 },
+      "web-interface-zone": { x: -2200, y: 0, width: 2000, height: 1500 },
+    };
+
+    // Build item
+    const id = `item-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+    const itemWidth = width || 1600; // Wider for two-column layout
+    const itemHeight = height || 700;
+
+    // Load existing items for positioning
+    const existingItems = await loadBoardItems();
+    console.log(`🔍 Loaded ${existingItems.length} existing items for positioning`);
+
+    // Determine position based on zone parameter
+    let itemX, itemY;
+    if (x !== undefined && y !== undefined) {
+      itemX = x;
+      itemY = y;
+      console.log(`📍 Using provided coordinates for DILI Diagnostic at (${itemX}, ${itemY})`);
+    } else if (zone && zoneConfig[zone]) {
+      const targetZone = zoneConfig[zone];
+      const tempItem = { type: "dili-diagnostic", width: itemWidth, height: itemHeight };
+      const zonePosition = findPositionInZone(tempItem, existingItems, targetZone);
+      itemX = zonePosition.x;
+      itemY = zonePosition.y;
+      console.log(`📍 Auto-positioned DILI Diagnostic in ${zone} at (${itemX}, ${itemY})`);
+    } else {
+      const tempItem = { type: "dili-diagnostic", width: itemWidth, height: itemHeight };
+      const taskPosition = findTaskZonePosition(tempItem, existingItems);
+      itemX = taskPosition.x;
+      itemY = taskPosition.y;
+      console.log(`📍 Auto-positioned DILI Diagnostic in Task Management Zone at (${itemX}, ${itemY})`);
+    }
+
+    const newItem = {
+      id,
+      type: "dili-diagnostic",
+      x: itemX,
+      y: itemY,
+      width: itemWidth,
+      height: itemHeight,
+      content: "DILI Diagnostic Panel",
+      color: "#ffffff",
+      rotation: 0,
+      diliData: {
+        pattern,
+        causality,
+        severity,
+        management,
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    // Persist
+    const items = [...existingItems, newItem];
+    await saveBoardItems(items);
+
+    // Notify live clients via SSE
+    const payload = {
+      event: "new-item",
+      item: newItem,
+      timestamp: new Date().toISOString(),
+      action: "created",
+      zone: zone || "task-management-zone",
+    };
+    broadcastSSE(payload);
+
+    console.log(`✅ Created DILI Diagnostic ${id} in ${zone || "task-management-zone"} at (${itemX}, ${itemY})`);
+
+    res.status(201).json(newItem);
+  } catch (error) {
+    console.error("Error creating DILI Diagnostic:", error);
+    res.status(500).json({ error: "Failed to create DILI Diagnostic" });
+  }
+});
+
+// POST /api/patient-report - Create a new Patient Report
+app.post("/api/patient-report", async (req, res) => {
+  try {
+    console.log("📋 POST /api/patient-report - Creating Patient Report");
+
+    const { patientData, zone, x, y, width, height } = req.body || {};
+
+    // Validate required fields
+    if (!patientData || !patientData.name || !patientData.mrn) {
+      return res.status(400).json({
+        error: "patientData object with name and mrn is required",
+      });
+    }
+
+    // Zone configuration mapping
+    const zoneConfig = {
+      "task-management-zone": { x: 5800, y: -2300, width: 2000, height: 2100 },
+      "retrieved-data-zone": { x: 5800, y: -4600, width: 2000, height: 2100 },
+      "doctors-note-zone": { x: 5800, y: 0, width: 2000, height: 2100 },
+      "adv-event-zone": { x: 0, y: 0, width: 4000, height: 2300 },
+      "data-zone": { x: 0, y: -1300, width: 4000, height: 1000 },
+      "raw-ehr-data-zone": { x: 1500, y: -3800, width: 2500, height: 2400 },
+      "dili-analysis-zone": { x: 0, y: 6000, width: 4000, height: 5500 },
+      "web-interface-zone": { x: -2200, y: 0, width: 2000, height: 1500 },
+    };
+
+    // Build item
+    const id = `item-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+    const itemWidth = width || 1600; // Two-column layout width
+    const itemHeight = height || 700;
+
+    // Load existing items for positioning
+    const existingItems = await loadBoardItems();
+    console.log(`🔍 Loaded ${existingItems.length} existing items for positioning`);
+
+    // Determine position based on zone parameter
+    let itemX, itemY;
+    if (x !== undefined && y !== undefined) {
+      itemX = x;
+      itemY = y;
+      console.log(`📍 Using provided coordinates for Patient Report at (${itemX}, ${itemY})`);
+    } else if (zone && zoneConfig[zone]) {
+      const targetZone = zoneConfig[zone];
+      const tempItem = { type: "patient-report", width: itemWidth, height: itemHeight };
+      const zonePosition = findPositionInZone(tempItem, existingItems, targetZone);
+      itemX = zonePosition.x;
+      itemY = zonePosition.y;
+      console.log(`📍 Auto-positioned Patient Report in ${zone} at (${itemX}, ${itemY})`);
+    } else {
+      const tempItem = { type: "patient-report", width: itemWidth, height: itemHeight };
+      const taskPosition = findTaskZonePosition(tempItem, existingItems);
+      itemX = taskPosition.x;
+      itemY = taskPosition.y;
+      console.log(`📍 Auto-positioned Patient Report in Task Management Zone at (${itemX}, ${itemY})`);
+    }
+
+    const newItem = {
+      id,
+      type: "patient-report",
+      x: itemX,
+      y: itemY,
+      width: itemWidth,
+      height: itemHeight,
+      content: "Patient Report",
+      color: "#ffffff",
+      rotation: 0,
+      patientData: {
+        ...patientData,
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    // Persist
+    const items = [...existingItems, newItem];
+    await saveBoardItems(items);
+
+    // Notify live clients via SSE
+    const payload = {
+      event: "new-item",
+      item: newItem,
+      timestamp: new Date().toISOString(),
+      action: "created",
+      zone: zone || "task-management-zone",
+    };
+    broadcastSSE(payload);
+
+    console.log(`✅ Created Patient Report ${id} in ${zone || "task-management-zone"} at (${itemX}, ${itemY})`);
+
+    res.status(201).json(newItem);
+  } catch (error) {
+    console.error("Error creating Patient Report:", error);
+    res.status(500).json({ error: "Failed to create Patient Report" });
+  }
 });
 
 // Health check endpoint

@@ -176,10 +176,14 @@ const CanvasContainer = styled.div`
   background: #ffffff;
 `;
 
-const ReactFlowWrapper = styled.div`
-  width: 100%;
-  height: 100%;
+const ReactFlowWrapper = styled.div<{ sidebarOpen: boolean }>`
+  position: absolute;
+  left: ${props => props.sidebarOpen ? 'clamp(380px, 30vw, 500px)' : '0'};
+  right: 0;
+  top: 0;
+  bottom: 0;
   background: #ffffff;
+  transition: left 0.3s ease;
   
   /* Custom selection styling for nodes */
   .react-flow__node.selected {
@@ -1851,7 +1855,7 @@ function Canvas2() {
           }
         `}
       </style>
-      <ReactFlowWrapper>
+      <ReactFlowWrapper sidebarOpen={showAgentChat}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -2314,7 +2318,7 @@ function Canvas2() {
       />
 
       {/* Agent Chat */}
-      <AgentChat isOpen={showAgentChat} />
+      <AgentChat isOpen={showAgentChat} onClose={() => setShowAgentChat(false)} />
     </div>
   );
 }

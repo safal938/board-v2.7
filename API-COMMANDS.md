@@ -614,6 +614,76 @@ Save this as `workflow.sh`, make it executable with `chmod +x workflow.sh`, and 
 
 ---
 
+## 14. DILI Diagnostic & Patient Report
+
+### Create DILI Diagnostic Panel
+
+Create a comprehensive DILI diagnostic panel with pattern recognition, causality analysis, severity assessment, and management plan:
+
+```bash
+curl -X POST http://localhost:3001/api/dili-diagnostic \
+  -H "Content-Type: application/json" \
+  -d '{
+    "pattern": {
+      "classification": "Hepatocellular",
+      "R_ratio": 12.5,
+      "keyLabs": [
+        {"label": "ALT", "value": "850 U/L", "note": "↑↑"},
+        {"label": "AST", "value": "720 U/L", "note": "↑↑"}
+      ],
+      "clinicalFeatures": ["Acute jaundice", "Fatigue"]
+    },
+    "causality": {
+      "primaryDrug": "Amoxicillin-Clavulanate",
+      "contributingFactors": ["Age > 60", "Female gender"],
+      "mechanisticRationale": ["Idiosyncratic hepatotoxicity"]
+    },
+    "severity": {
+      "features": ["Hy'\''s Law criteria met"],
+      "prognosis": "Moderate severity"
+    },
+    "management": {
+      "immediateActions": ["Discontinue drug"],
+      "consults": ["Hepatology"],
+      "monitoringPlan": ["Weekly LFTs"]
+    },
+    "zone": "task-management-zone"
+  }' | jq
+```
+
+### Create Patient Report
+
+Create a comprehensive patient summary report:
+
+```bash
+curl -X POST http://localhost:3001/api/patient-report \
+  -H "Content-Type: application/json" \
+  -d '{
+    "patientData": {
+      "name": "Jane Smith",
+      "mrn": "MRN-789456",
+      "age": 58,
+      "sex": "Female",
+      "primaryDiagnosis": "Drug-Induced Liver Injury",
+      "allergies": ["Penicillin - Rash"],
+      "medication_history": [
+        {"name": "Lisinopril", "dose": "10mg daily"}
+      ],
+      "management_recommendations": [
+        "Discontinue causative agent",
+        "Monitor liver function"
+      ]
+    },
+    "zone": "doctors-note-zone"
+  }' | jq
+```
+
+**For detailed documentation and examples, see:**
+- [DILI Diagnostic & Patient Report API Documentation](documentation/DILI_PATIENT_REPORT_API.md)
+- Test script: `node test-dili-patient-api.js`
+
+---
+
 ## Notes
 
 - All POST requests require `Content-Type: application/json` header
