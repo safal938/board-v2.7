@@ -16,13 +16,14 @@ import ReactFlow, {
 } from 'reactflow';
 import styled from 'styled-components';
 import 'reactflow/dist/style.css';
-import { FileText, Image as ImageIcon, X, Plus, Mic, MicOff, Layers, Zap, Activity, Database, AlertTriangle, GitMerge } from 'lucide-react';
+import { FileText, Image as ImageIcon, X, Plus, Mic, MicOff, Layers, Zap, Activity, Database, AlertTriangle, GitMerge, MessageSquare } from 'lucide-react';
 import zoneConfig from '../data/zone-config.json';
 import boardItemsData from '../data/boardItems.json';
 import BoardItem from './BoardItem';
 import TriageFlowNode from './TriageFlowNode';
 import EHRHubNode from './EHRHubNode';
 import AlertModal from './AlertModal';
+import AgentChat from './AgentChat';
 
 interface ZoneContainerProps {
   color: string;
@@ -614,6 +615,7 @@ function Canvas2() {
   } | null>(null);
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [showAgentChat, setShowAgentChat] = useState(false);
   const [alertModal, setAlertModal] = useState<{
     isOpen: boolean;
     message: string;
@@ -835,8 +837,8 @@ function Canvas2() {
           type: 'custom',
           position: { x: 1200, y: -650 },
           data: {
-            label: 'Data Consolidator',
-            content: 'Processing and consolidating EHR data',
+            label: 'Clinical Data Integrator',
+            content: 'The whole EHR data from all the patient visits are integrated and significant findings are visually represented.',
             color: '#2196F3',
             icon: 'merge',
             badge: 'Consolidated'
@@ -856,8 +858,8 @@ function Canvas2() {
           type: 'custom',
           position: { x: 1200, y: 2550 },
           data: {
-            label: 'Adverse Event Analyzer',
-            content: 'Analyzing patient data for adverse events',
+            label: 'Adverse Event Tracker',
+            content: 'Tracks and analyses possible adverse events or complications over time.',
             color: '#2196F3',
             icon: 'alert',
             badge: 'Analyzed'
@@ -2074,6 +2076,44 @@ function Canvas2() {
         >
           <X size={22} />
         </button>
+
+        {/* Agent Chat Toggle Button */}
+        <button
+          onClick={() => setShowAgentChat(!showAgentChat)}
+          style={{
+            width: '52px',
+            height: '52px',
+            border: '2px solid rgba(2, 136, 209, 0.15)',
+            borderRadius: '14px',
+            background: showAgentChat ? 'linear-gradient(135deg, #0288d1 0%, #03a9f4 100%)' : 'white',
+            color: showAgentChat ? 'white' : '#0288d1',
+            cursor: 'pointer',
+            boxShadow: '0 4px 16px rgba(2, 136, 209, 0.12)',
+            transition: 'all 0.2s ease',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          title="Toggle Agent Chat"
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-3px) scale(1.05)';
+            e.currentTarget.style.boxShadow = '0 6px 20px rgba(2, 136, 209, 0.3)';
+            if (!showAgentChat) {
+              e.currentTarget.style.background = 'linear-gradient(135deg, #0288d1 0%, #03a9f4 100%)';
+              e.currentTarget.style.color = 'white';
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0) scale(1)';
+            e.currentTarget.style.boxShadow = '0 4px 16px rgba(2, 136, 209, 0.12)';
+            if (!showAgentChat) {
+              e.currentTarget.style.background = 'white';
+              e.currentTarget.style.color = '#0288d1';
+            }
+          }}
+        >
+          <MessageSquare size={22} />
+        </button>
       </div>
 
       {/* Click outside to close menu */}
@@ -2272,6 +2312,9 @@ function Canvas2() {
         message={alertModal.message}
         type={alertModal.type}
       />
+
+      {/* Agent Chat */}
+      <AgentChat isOpen={showAgentChat} />
     </div>
   );
 }

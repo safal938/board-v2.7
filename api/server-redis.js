@@ -584,6 +584,14 @@ const DOCTORS_NOTE_ZONE = {
   height: 2100,
 };
 
+// Raw EHR Data Zone boundaries
+const RAW_EHR_DATA_ZONE = {
+  x: 1500,
+  y: -3800,
+  width: 2500,
+  height: 2400,
+};
+
 // Find position within Doctor's Notes Zone with proper spacing
 const findDoctorsNotePosition = (newItem, existingItems) => {
   const padding = 50; // Space between items and zone border
@@ -1182,7 +1190,7 @@ app.post("/api/agents", async (req, res) => {
       "doctors-note-zone": { x: 5800, y: 0, width: 2000, height: 2100 },
       "adv-event-zone": { x: 0, y: 0, width: 4000, height: 2300 },
       "data-zone": { x: 0, y: -1300, width: 4000, height: 1000 },
-      "raw-ehr-data-zone": { x: 0, y: -4600, width: 4000, height: 3000 },
+      "raw-ehr-data-zone": { x: 1500, y: -3800, width: 2500, height: 2400 },
       "web-interface-zone": { x: -2200, y: 0, width: 2000, height: 1500 },
     };
 
