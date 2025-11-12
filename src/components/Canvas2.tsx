@@ -643,6 +643,50 @@ function Canvas2() {
     [setEdges],
   );
 
+  // Handle node drag stop - update position in backend
+  const onNodeDragStop = useCallback((_event: React.MouseEvent, node: Node) => {
+    // Only update positions for draggable items (not zones)
+    if (node.type === 'zone' || node.id.startsWith('zone-') || node.id.includes('subzone-')) {
+      console.log(`⏭️ Skipping position update for zone: ${node.id}`);
+      return;
+    }
+
+    const newX = Math.round(node.position.x);
+    const newY = Math.round(node.position.y);
+    const startTime = Date.now();
+
+    console.log(`📍 Node ${node.id} dragged to (${newX}, ${newY}) at ${startTime}`);
+
+    // Update local state immediately (optimistic update)
+    setItems((prev) =>
+      prev.map((item) => (item.id === node.id ? { ...item, x: newX, y: newY } : item))
+    );
+
+    // Sync position to backend
+    const url = `${API_BASE_URL}/api/board-items/${node.id}`;
+    const payload = { x: newX, y: newY };
+    
+    fetch(url, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+      .then(async (response) => {
+        const roundTripTime = Date.now() - startTime;
+        if (response.ok) {
+          const data = await response.json();
+          console.log(`✅ Position synced for ${node.id} in ${roundTripTime}ms`);
+        } else {
+          const error = await response.text();
+          console.error(`❌ Failed to update position for ${node.id} after ${roundTripTime}ms:`, response.status, error);
+        }
+      })
+      .catch((err) => {
+        const roundTripTime = Date.now() - startTime;
+        console.error(`❌ Network error after ${roundTripTime}ms:`, err);
+      });
+  }, [API_BASE_URL, setItems]);
+
   // Handlers for BoardItem
   const handleUpdateItem = useCallback((id: string, updates: any) => {
     // Update items state
@@ -673,7 +717,8 @@ function Canvas2() {
     if (
       updates.height !== undefined ||
       updates.noteData !== undefined ||
-      updates.content !== undefined
+      updates.content !== undefined ||
+      updates.patientData !== undefined
     ) {
       fetch(`${API_BASE_URL}/api/board-items/${id}`, {
         method: 'PUT',
@@ -756,21 +801,17 @@ function Canvas2() {
   useEffect(() => {
     const loadItems = async () => {
       try {
-        // Start with static data
-        let allItems = [...boardItemsData];
+        // Try to load from backend API first (API is source of truth)
+        let allItems = [...boardItemsData]; // Default to static data
         
-        // Try to load from backend API
         try {
           const response = await fetch(`${API_BASE_URL}/api/board-items`);
           if (response.ok) {
-            const apiItems = await response.json();
-            const staticIds = new Set(boardItemsData.map((item: any) => item.id));
-            const uniqueApiItems = apiItems.filter((item: any) => !staticIds.has(item.id));
-            allItems = [...boardItemsData, ...uniqueApiItems];
-            console.log('✅ Loaded items from backend:', allItems.length);
+            allItems = await response.json();
+            console.log('✅ Loaded items from backend API (source of truth):', allItems.length);
           }
         } catch (apiError) {
-          console.log('⚠️ API not available, using only static data');
+          console.log('⚠️ API not available, using static data as fallback');
         }
 
         setItems(allItems);
@@ -839,7 +880,7 @@ function Canvas2() {
         const dataConsolidatorNode: Node = {
           id: 'data-consolidator',
           type: 'custom',
-          position: { x: 1200, y: -650 },
+          position: { x: 360, y: -700 },
           data: {
             label: 'Clinical Data Integrator',
             content: 'The whole EHR data from all the patient visits are integrated and significant findings are visually represented.',
@@ -860,7 +901,7 @@ function Canvas2() {
         const adverseEventConsolidatorNode: Node = {
           id: 'adverse-event-consolidator',
           type: 'custom',
-          position: { x: 1200, y: 2550 },
+          position: { x: 360, y: 2500 },
           data: {
             label: 'Adverse Event Tracker',
             content: 'Tracks and analyses possible adverse events or complications over time.',
@@ -1179,11 +1220,12 @@ function Canvas2() {
 
         es.addEventListener('item-updated', (event: any) => {
           try {
+            const receiveTime = Date.now();
             const data = JSON.parse(event.data);
             const updatedItem = data.item;
             if (!updatedItem) return;
 
-            console.log('🔄 Item updated:', updatedItem.id);
+            console.log(`🔄 SSE received at ${receiveTime}: ${updatedItem.id} → (${updatedItem.x}, ${updatedItem.y})`);
 
             // Update items state
             setItems((prev) => {
@@ -1192,12 +1234,13 @@ function Canvas2() {
               );
             });
 
-            // Update nodes
+            // Update nodes (including position)
             setNodes((nds) => {
               return nds.map((node) => {
                 if (node.id === updatedItem.id) {
                   return {
                     ...node,
+                    position: { x: updatedItem.x, y: updatedItem.y },
                     data: {
                       ...node.data,
                       item: updatedItem,
@@ -1207,6 +1250,9 @@ function Canvas2() {
                 return node;
               });
             });
+            
+            const processTime = Date.now() - receiveTime;
+            console.log(`⚡ SSE processed in ${processTime}ms`);
           } catch (err) {
             console.error('❌ Error handling item-updated event:', err);
           }
@@ -1219,6 +1265,19 @@ function Canvas2() {
             sendQueryToEASL(query, metadata);
           } catch (err) {
             console.error('❌ Error handling easl-query event:', err);
+          }
+        });
+
+        es.addEventListener('board-reloaded', (event: any) => {
+          try {
+            const data = JSON.parse(event.data);
+            console.log('🔄 Board reloaded event received:', data.message);
+            console.log('🔃 Refreshing page to load updated board items...');
+            
+            // Reload the page to get fresh data from Redis
+            window.location.reload();
+          } catch (err) {
+            console.error('❌ Error handling board-reloaded event:', err);
           }
         });
 
@@ -1654,35 +1713,43 @@ function Canvas2() {
         );
       });
       
-      console.log(`🗑️ Deleting ${itemsToDelete.length} items...`);
+      console.log(`🗑️ Found ${itemsToDelete.length} items to delete`);
       
-      if (itemsToDelete.length === 0) {
-        console.log('⚠️ No items to delete');
-        setIsDeleting(false);
-        setDeleteResult({
-          success: false,
-          deletedCount: 0,
-          error: 'No items to delete'
+      let deletedCount = 0;
+      let remainingCount = items.length;
+      
+      // Delete items if there are any
+      if (itemsToDelete.length > 0) {
+        const itemIds = itemsToDelete.map(item => item.id);
+        
+        // Use batch delete endpoint
+        const response = await fetch(`${API_BASE_URL}/api/board-items/batch-delete`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ itemIds }),
         });
-        setShowResultModal(true);
-        return;
+        
+        if (!response.ok) {
+          throw new Error('Failed to batch delete items');
+        }
+        
+        const result = await response.json();
+        console.log(`✅ Batch delete complete:`, result);
+        deletedCount = result.deletedCount;
+        remainingCount = result.remainingCount;
+        
+        // Update state - remove deleted items but keep zones
+        const deletedIdsSet = new Set(itemIds);
+        setItems((prev) => prev.filter((item) => !deletedIdsSet.has(item.id)));
+        setNodes((nds) => nds.filter((node) => {
+          // Keep zones (they start with 'zone-')
+          if (node.id.startsWith('zone-')) return true;
+          // Keep items that weren't deleted
+          return !deletedIdsSet.has(node.id);
+        }));
+      } else {
+        console.log('⚠️ No dynamic items to delete, but will still reset positions and EASL history');
       }
-      
-      const itemIds = itemsToDelete.map(item => item.id);
-      
-      // Use batch delete endpoint
-      const response = await fetch(`${API_BASE_URL}/api/board-items/batch-delete`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ itemIds }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to batch delete items');
-      }
-      
-      const result = await response.json();
-      console.log(`✅ Batch delete complete:`, result);
       
       // Reset EASL conversation history
       try {
@@ -1710,21 +1777,31 @@ function Canvas2() {
         console.warn('⚠️ Error resetting EASL conversation history:', easlError);
       }
       
-      // Update state - remove deleted items but keep zones
-      const deletedIdsSet = new Set(itemIds);
-      setItems((prev) => prev.filter((item) => !deletedIdsSet.has(item.id)));
-      setNodes((nds) => nds.filter((node) => {
-        // Keep zones (they start with 'zone-')
-        if (node.id.startsWith('zone-')) return true;
-        // Keep items that weren't deleted
-        return !deletedIdsSet.has(node.id);
-      }));
+      // Reload board items from static file (resets Redis to default state)
+      try {
+        console.log('🔄 Reloading board items from static file...');
+        const reloadResponse = await fetch(`${API_BASE_URL}/api/reload-board-items`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        });
+        
+        if (reloadResponse.ok) {
+          const reloadResult = await reloadResponse.json();
+          console.log(`✅ Board items reloaded from static file: ${reloadResult.itemCount} items`);
+          console.log('🔃 All connected clients will refresh automatically via SSE');
+        } else {
+          console.warn('⚠️ Failed to reload board items from static file');
+        }
+      } catch (reloadError) {
+        console.warn('⚠️ Error reloading board items:', reloadError);
+      }
       
+      // Show success result
       setIsDeleting(false);
       setDeleteResult({
         success: true,
-        deletedCount: result.deletedCount,
-        remainingCount: result.remainingCount
+        deletedCount: deletedCount,
+        remainingCount: remainingCount
       });
       setShowResultModal(true);
       
@@ -1864,6 +1941,7 @@ function Canvas2() {
           onConnect={onConnect}
           onNodeClick={onNodeClick}
           onPaneClick={onPaneClick}
+          onNodeDragStop={onNodeDragStop}
           nodeTypes={nodeTypes}
           onInit={(instance) => {
             reactFlowInstance.current = instance;
@@ -1880,7 +1958,7 @@ function Canvas2() {
           nodesConnectable={false}
           elementsSelectable={true}
         >
-          <Controls />
+          <Controls showInteractive={false} />
           <Background 
             variant={BackgroundVariant.Dots} 
             gap={32} 
@@ -2167,29 +2245,32 @@ function Canvas2() {
             onClick={(e) => e.stopPropagation()}
           >
             <h2 style={{ margin: '0 0 16px 0', fontSize: '24px', fontWeight: 600, color: '#dc2626', display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span>⚠️</span> Reset Board
+              <span>⚠️</span> Reset Board to Default
             </h2>
             
             <p style={{ margin: '0 0 12px 0', fontSize: '16px', lineHeight: 1.6, color: '#374151' }}>
-              This will delete <strong>ALL API-added items</strong> from the board.
+              This will <strong>reset the board to its default state</strong>.
             </p>
             
-            <p style={{ margin: '12px 0', fontSize: '16px', fontWeight: 600, color: '#374151' }}>
-              Items that will be deleted:
-            </p>
-            <ul style={{ margin: '12px 0', paddingLeft: '24px', color: '#374151' }}>
-              <li style={{ margin: '6px 0', fontSize: '15px' }}>Todos and Enhanced Todos</li>
-              <li style={{ margin: '6px 0', fontSize: '15px' }}>Agent Results</li>
-              <li style={{ margin: '6px 0', fontSize: '15px' }}>Doctor's Notes</li>
-              <li style={{ margin: '6px 0', fontSize: '15px' }}>Lab Results</li>
-            </ul>
+            <div style={{ background: '#fef2f2', border: '2px solid #fecaca', borderRadius: '8px', padding: '16px', margin: '16px 0' }}>
+              <p style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#991b1b' }}>
+                What will happen:
+              </p>
+              <ul style={{ margin: '0', paddingLeft: '20px', color: '#991b1b', fontSize: '14px', lineHeight: 1.8 }}>
+                <li>Delete dynamic items (todos, notes, images, agent results)</li>
+                <li>Reset ALL item positions to default</li>
+                <li>Clear EASL conversation history</li>
+                <li>Reload board from static file</li>
+                <li>Refresh all connected browser tabs</li>
+              </ul>
+            </div>
             
             <p style={{ margin: '12px 0', fontSize: '16px', fontWeight: 600, color: '#374151' }}>
               Items that will remain:
             </p>
             <ul style={{ margin: '12px 0', paddingLeft: '24px', color: '#374151' }}>
-              <li style={{ margin: '6px 0', fontSize: '15px' }}>Raw EHR Data</li>
-              <li style={{ margin: '6px 0', fontSize: '15px' }}>Single Encounter Data</li>
+              <li style={{ margin: '6px 0', fontSize: '15px' }}>Raw EHR Data (at default positions)</li>
+              <li style={{ margin: '6px 0', fontSize: '15px' }}>Single Encounter Data (at default positions)</li>
             </ul>
             
             <div style={{ background: '#fef2f2', border: '2px solid #fecaca', borderRadius: '8px', padding: '16px', margin: '20px 0', color: '#991b1b', fontWeight: 500, fontSize: '15px' }}>
@@ -2272,9 +2353,19 @@ function Canvas2() {
             
             {deleteResult.success ? (
               <>
-                <p style={{ margin: '0 0 12px 0', fontSize: '16px', lineHeight: 1.6, color: '#374151' }}>
-                  Successfully deleted <strong>{deleteResult.deletedCount}</strong> items from the board.
-                </p>
+                {deleteResult.deletedCount > 0 ? (
+                  <p style={{ margin: '0 0 12px 0', fontSize: '16px', lineHeight: 1.6, color: '#374151' }}>
+                    Successfully deleted <strong>{deleteResult.deletedCount}</strong> dynamic items from the board.
+                  </p>
+                ) : (
+                  <p style={{ margin: '0 0 12px 0', fontSize: '16px', lineHeight: 1.6, color: '#374151' }}>
+                    No dynamic items to delete.
+                  </p>
+                )}
+                <div style={{ background: '#f0fdf4', border: '2px solid #86efac', borderRadius: '8px', padding: '12px', margin: '12px 0', color: '#166534' }}>
+                  <p style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600 }}>✅ Board Reset Complete:</p>
+                 
+                </div>
                 {deleteResult.remainingCount !== undefined && (
                   <p style={{ margin: '0 0 12px 0', fontSize: '16px', lineHeight: 1.6, color: '#374151' }}>
                     <strong>{deleteResult.remainingCount}</strong> items remaining on the board.
@@ -2283,7 +2374,7 @@ function Canvas2() {
               </>
             ) : (
               <p style={{ margin: '0 0 12px 0', fontSize: '16px', lineHeight: 1.6, color: '#991b1b' }}>
-                {deleteResult.error || 'An error occurred while deleting items.'}
+                {deleteResult.error || 'An error occurred while resetting the board.'}
               </p>
             )}
             

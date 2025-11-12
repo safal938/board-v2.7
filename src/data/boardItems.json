@@ -2,7 +2,7 @@
   {
     "id": "dashboard-item-1759853783245-patient-context",
     "type": "component",
-    "x": 100,
+    "x": -1150,
     "y": 3600,
     "width": 1600,
     "height": "auto",
@@ -83,7 +83,7 @@
   {
     "id": "dashboard-item-1759906076097-medication-timeline",
     "type": "component",
-    "x": 1750,
+    "x": 500,
     "y": 3600,
     "width": 1600,
     "height": "auto",
@@ -208,7 +208,7 @@
   {
     "id": "dashboard-item-1759906219477-adverse-event-analytics",
     "type": "component",
-    "x": 100,
+    "x": -1150,
     "y": 4200,
     "width": 1600,
     "height": "auto",
@@ -353,7 +353,7 @@
   {
     "id": "dashboard-item-1759906246155-lab-table",
     "type": "component",
-    "x": 1750,
+    "x": 500,
     "y": 4400,
     "width": 520,
     "height": 500,
@@ -421,7 +421,7 @@
   {
     "id": "dashboard-item-1759906246156-lab-chart",
     "type": "component",
-    "x": 2300,
+    "x": 1050,
     "y": 4400,
     "width": 520,
     "height": 500,
@@ -511,7 +511,7 @@
   {
     "id": "dashboard-item-1759906246157-differential-diagnosis",
     "type": "component",
-    "x": 2850,
+    "x": 1600,
     "y": 4400,
     "width": 520,
     "height": 500,
@@ -561,8 +561,8 @@
   {
     "id": "dashboard-item-1759906300003-single-encounter-1",
     "type": "component",
-    "x": -300,
-    "y": 650,
+    "x": -1300,
+    "y": 800,
     "width": 400,
     "height": 500,
     "componentType": "SingleEncounterDocument",
@@ -642,8 +642,8 @@
   {
     "id": "dashboard-item-1759906300004-single-encounter-2",
     "type": "component",
-    "x": 300,
-    "y": 1000,
+    "x": -700,
+    "y": 800,
     "width": 500,
     "height": 600,
     "componentType": "SingleEncounterDocument",
@@ -729,8 +729,8 @@
   {
     "id": "dashboard-item-1759906300004-single-encounter-3",
     "type": "component",
-    "x": 1000,
-    "y": 650,
+    "x": 0,
+    "y": 800,
     "width": 500,
     "height": 600,
     "componentType": "SingleEncounterDocument",
@@ -831,8 +831,8 @@
   {
     "id": "dashboard-item-1759906300004-single-encounter-4",
     "type": "component",
-    "x": 1700,
-    "y": 1000,
+    "x": 700,
+    "y": 800,
     "width": 500,
     "height": 600,
     "componentType": "SingleEncounterDocument",
@@ -926,8 +926,8 @@
   {
     "id": "dashboard-item-1759906300004-single-encounter-5",
     "type": "component",
-    "x": 2400,
-    "y": 650,
+    "x": 1400,
+    "y": 800,
     "width": 500,
     "height": 600,
     "componentType": "SingleEncounterDocument",
@@ -1019,8 +1019,8 @@
   {
     "id": "dashboard-item-1759906300004-single-encounter-6",
     "type": "component",
-    "x": 3100,
-    "y": 1000,
+    "x": 2100,
+    "y": 800,
     "width": 500,
     "height": 600,
     "componentType": "SingleEncounterDocument",
@@ -1992,11 +1992,10 @@
     "createdAt": "2025-10-28T12:00:00.000Z",
     "updatedAt": "2025-10-28T12:00:00.000Z"
   },
-
   {
     "id": "ehr-hub-nervecentre",
     "type": "ehrHub",
-    "x": -2400,
+    "x": -700,
     "y": -5400,
     "width": 350,
     "height": 250,
@@ -2012,7 +2011,7 @@
   {
     "id": "ehr-hub-medilogik",
     "type": "ehrHub",
-    "x": 600,
+    "x": 920,
     "y": -3350,
     "width": 350,
     "height": 250,
@@ -2028,7 +2027,7 @@
   {
     "id": "ehr-hub-viper",
     "type": "ehrHub",
-    "x": -200,
+    "x": 200,
     "y": -3350,
     "width": 350,
     "height": 250,
@@ -2044,7 +2043,7 @@
   {
     "id": "ehr-hub-ice",
     "type": "ehrHub",
-    "x": -2400,
+    "x": -1380,
     "y": -3350,
     "width": 350,
     "height": 250,
@@ -2060,7 +2059,7 @@
   {
     "id": "ehr-hub-bighand",
     "type": "ehrHub",
-    "x": 1500,
+    "x": 2200,
     "y": -5400,
     "width": 350,
     "height": 250,
@@ -2082,7 +2081,7 @@
     "height": 1100,
     "data": {
       "label": "Nervecentre EPR Data",
-       "color": "#3b82f6",
+      "color": "#3b82f6",
       "handlePosition": "top"
     },
     "style": {
@@ -2178,7 +2177,7 @@
     "height": 900,
     "data": {
       "label": "VIPER Ultrasound Data",
-       "color": "#3b82f6",
+      "color": "#3b82f6",
       "handlePosition": "top"
     },
     "style": {
@@ -2196,8 +2195,8 @@
   {
     "id": "dashboard-item-generate-diagnosis-button",
     "type": "button",
-    "x": 1300,
-    "y": 6100,
+    "x": -50,
+    "y": 7100,
     "width": 650,
     "height": 50,
     "buttonText": "Generate DILI Diagnosis",
@@ -2210,8 +2209,8 @@
   {
     "id": "dashboard-item-generate-report-button",
     "type": "button",
-    "x": 2000,
-    "y": 6100,
+    "x": 750,
+    "y": 7100,
     "width": 650,
     "height": 50,
     "buttonText": "Generate Patient Report",
