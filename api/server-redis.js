@@ -489,9 +489,8 @@ const findPositionInZone = (newItem, existingItems, zoneConfig) => {
   const colWidth = 520; // Standard column width for items
   const startX = zoneConfig.x + 60; // Start 60px from left edge
   const startY = zoneConfig.y + 60; // Start 60px from top edge
-  const maxColumns = Math.floor(
-    (zoneConfig.width - 120) / (colWidth + padding)
-  ); // Calculate max columns based on zone width
+  const newItemHeight = estimateItemHeight(newItem);
+  const newItemWidth = newItem.width || colWidth;
 
   // Filter existing items to only those in the specified zone
   const zoneItems = existingItems.filter(
@@ -506,26 +505,76 @@ const findPositionInZone = (newItem, existingItems, zoneConfig) => {
     `🎯 Finding position in zone (${zoneConfig.x}, ${zoneConfig.y}) for ${newItem.type} item`
   );
   console.log(`📊 Found ${zoneItems.length} existing items in zone`);
-
-  // Estimate height of new item
-  const newItemHeight = estimateItemHeight(newItem);
-  const newItemWidth = newItem.width || colWidth;
-
   console.log(
     `📏 Estimated new item dimensions: ${newItemWidth}w × ${newItemHeight}h`
   );
 
-  // Create columns to track Y positions
+  // Helper function to check if two rectangles overlap
+  const overlaps = (x1, y1, w1, h1, x2, y2, w2, h2) => {
+    return !(x1 + w1 + padding < x2 || x2 + w2 + padding < x1 || 
+             y1 + h1 + padding < y2 || y2 + h2 + padding < y1);
+  };
+
+  // For wide items (>= 1000px), use vertical stacking instead of columns
+  if (newItemWidth >= 1000) {
+    console.log(`📐 Wide item detected (${newItemWidth}px), using vertical stacking`);
+    
+    // Try to find a position that doesn't overlap with existing items
+    let candidateY = startY;
+    let attempts = 0;
+    const maxAttempts = 50;
+    
+    while (attempts < maxAttempts) {
+      const candidateX = startX;
+      let hasOverlap = false;
+      
+      // Check if this position overlaps with any existing item
+      for (const item of zoneItems) {
+        const itemWidth = item.width || colWidth;
+        const itemHeight = estimateItemHeight(item);
+        
+        if (overlaps(candidateX, candidateY, newItemWidth, newItemHeight,
+                     item.x, item.y, itemWidth, itemHeight)) {
+          hasOverlap = true;
+          // Move below this item
+          candidateY = Math.max(candidateY, item.y + itemHeight + padding);
+          break;
+        }
+      }
+      
+      if (!hasOverlap) {
+        console.log(`✅ Found non-overlapping position at (${candidateX}, ${candidateY})`);
+        return { x: candidateX, y: candidateY };
+      }
+      
+      attempts++;
+    }
+    
+    console.log(`✅ Placing wide item at (${startX}, ${candidateY}) after ${attempts} attempts`);
+    return { x: startX, y: candidateY };
+  }
+
+  // For normal-width items, use column-based layout
+  const maxColumns = Math.floor(
+    (zoneConfig.width - 120) / (colWidth + padding)
+  );
   const columns = Array(maxColumns).fill(startY);
 
   // Place existing items into columns based on their X position
   zoneItems.forEach((item) => {
+    const itemWidth = item.width || colWidth;
+    
+    // Skip wide items in column calculation
+    if (itemWidth >= 1000) {
+      console.log(`⏭️  Skipping wide item ${item.id} in column calculation`);
+      return;
+    }
+    
     const col = Math.floor((item.x - startX) / (colWidth + padding));
     if (col >= 0 && col < maxColumns) {
       const itemHeight = estimateItemHeight(item);
       const itemBottom = item.y + itemHeight + padding;
 
-      // Update column height if this item extends further down
       if (itemBottom > columns[col]) {
         columns[col] = itemBottom;
       }
@@ -557,7 +606,6 @@ const findPositionInZone = (newItem, existingItems, zoneConfig) => {
   // Check if position is within zone bounds
   if (y + newItemHeight > zoneConfig.y + zoneConfig.height) {
     console.log(`⚠️  Item would exceed zone height, trying other columns`);
-    // If it exceeds, try to find space in another column
     for (let col = 0; col < maxColumns; col++) {
       if (columns[col] + newItemHeight <= zoneConfig.y + zoneConfig.height) {
         const altX = startX + col * (colWidth + padding);
@@ -566,7 +614,6 @@ const findPositionInZone = (newItem, existingItems, zoneConfig) => {
         return { x: altX, y: altY };
       }
     }
-    // If no space found, place at top of first column (will overlap)
     console.log(`⚠️  No space found, placing at top of zone`);
     return { x: startX, y: startY };
   }
@@ -978,11 +1025,15 @@ app.post("/api/board-items", async (req, res) => {
 
 // PUT /api/board-items/:id - Update a board item
 app.put("/api/board-items/:id", async (req, res) => {
+  const startTime = Date.now();
   try {
     const { id } = req.params;
     const updates = req.body;
 
+    const loadStart = Date.now();
     const items = await loadBoardItems();
+    const loadTime = Date.now() - loadStart;
+    
     const itemIndex = items.findIndex((item) => item.id === id);
 
     if (itemIndex === -1) {
@@ -996,12 +1047,31 @@ app.put("/api/board-items/:id", async (req, res) => {
       updatedAt: new Date().toISOString(),
     };
 
-    await saveBoardItems(items);
+    // Broadcast immediately for instant real-time updates (don't wait for Redis)
+    const broadcastStart = Date.now();
+    broadcastSSE({
+      event: 'item-updated',
+      item: items[itemIndex],
+    }).catch(err => console.error('SSE broadcast error:', err));
+    const broadcastTime = Date.now() - broadcastStart;
+
+    // Save to Redis in parallel (don't block the response)
+    const saveStart = Date.now();
+    const savePromise = saveBoardItems(items);
 
     // If height was updated, also update the source data file
     if (updates.height !== undefined) {
-      await updateSourceDataHeight(id, updates.height);
+      updateSourceDataHeight(id, updates.height).catch(err => 
+        console.error('Source data update error:', err)
+      );
     }
+
+    // Wait for Redis save before responding (ensures data consistency)
+    await savePromise;
+    const saveTime = Date.now() - saveStart;
+
+    const totalTime = Date.now() - startTime;
+    console.log(`⚡ Position update: ${id} → (${updates.x}, ${updates.y}) | Load: ${loadTime}ms, Broadcast: ${broadcastTime}ms, Save: ${saveTime}ms, Total: ${totalTime}ms`);
 
     res.json(items[itemIndex]);
   } catch (error) {
@@ -1185,13 +1255,13 @@ app.post("/api/agents", async (req, res) => {
 
     // Zone configuration mapping
     const zoneConfig = {
-      "task-management-zone": { x: 5800, y: -2300, width: 2000, height: 2100 },
-      "retrieved-data-zone": { x: 5800, y: -4600, width: 2000, height: 2100 },
-      "doctors-note-zone": { x: 5800, y: 0, width: 2000, height: 2100 },
-      "adv-event-zone": { x: 0, y: 0, width: 4000, height: 2300 },
-      "data-zone": { x: 0, y: -1300, width: 4000, height: 1000 },
-      "raw-ehr-data-zone": { x: 1500, y: -3800, width: 2500, height: 2400 },
-      "dili-analysis-zone": { x: 0, y: 6000, width: 4000, height: 5500 },
+      "task-management-zone": { x: -250, y: -2300, width: 2000, height: 2100 },
+      "retrieved-data-zone": { x: -250, y: -4600, width: 2000, height: 2100 },
+      "doctors-note-zone": { x: -250, y: 0, width: 2000, height: 2100 },
+      "adv-event-zone": { x: -1250, y: 3500, width: 4000, height: 2300 },
+      "data-zone": { x: -1500, y: 500, width: 4500, height: 1500 },
+      "raw-ehr-data-zone": { x: -2500, y: -5600, width: 6500, height: 4200 },
+      "dili-analysis-zone": { x: -1250, y: 7000, width: 4000, height: 5500 },
       "web-interface-zone": { x: -2200, y: 0, width: 2000, height: 1500 },
     };
 
@@ -2251,9 +2321,19 @@ app.post("/api/reload-board-items", async (req, res) => {
       console.log(`✅ Reloaded ${staticItems.length} items from static file to Redis`);
     }
     
+    // Broadcast reload event to all connected clients so they refresh
+    await broadcastSSE({
+      event: 'board-reloaded',
+      message: 'Board items reloaded from static file',
+      itemCount: staticItems.length,
+      timestamp: new Date().toISOString()
+    });
+    
+    console.log(`📡 Broadcasted board-reloaded event to all clients`);
+    
     res.json({
       success: true,
-      message: "Board items reloaded from static file",
+      message: "Board items reloaded from static file. All clients will refresh automatically.",
       itemCount: staticItems.length,
       hasIframeItem: staticItems.some(item => item.id === "iframe-item-easl-interface")
     });
@@ -2569,13 +2649,13 @@ app.post("/api/dili-diagnostic", async (req, res) => {
 
     // Zone configuration mapping
     const zoneConfig = {
-      "task-management-zone": { x: 5800, y: -2300, width: 2000, height: 2100 },
-      "retrieved-data-zone": { x: 5800, y: -4600, width: 2000, height: 2100 },
-      "doctors-note-zone": { x: 5800, y: 0, width: 2000, height: 2100 },
-      "adv-event-zone": { x: 0, y: 0, width: 4000, height: 2300 },
-      "data-zone": { x: 0, y: -1300, width: 4000, height: 1000 },
-      "raw-ehr-data-zone": { x: 1500, y: -3800, width: 2500, height: 2400 },
-      "dili-analysis-zone": { x: 0, y: 6000, width: 4000, height: 5500 },
+      "task-management-zone": { x: -250, y: -2300, width: 2000, height: 2100 },
+      "retrieved-data-zone": { x: -250, y: -4600, width: 2000, height: 2100 },
+      "doctors-note-zone": { x: -250, y: 0, width: 2000, height: 2100 },
+      "adv-event-zone": { x: -1250, y: 3500, width: 4000, height: 2300 },
+      "data-zone": { x: -1500, y: 500, width: 4500, height: 1500 },
+      "raw-ehr-data-zone": { x: -2500, y: -5600, width: 6500, height: 4200 },
+      "dili-analysis-zone": { x: -1250, y: 7000, width: 4000, height: 5500 },
       "web-interface-zone": { x: -2200, y: 0, width: 2000, height: 1500 },
     };
 
@@ -2668,13 +2748,13 @@ app.post("/api/patient-report", async (req, res) => {
 
     // Zone configuration mapping
     const zoneConfig = {
-      "task-management-zone": { x: 5800, y: -2300, width: 2000, height: 2100 },
-      "retrieved-data-zone": { x: 5800, y: -4600, width: 2000, height: 2100 },
-      "doctors-note-zone": { x: 5800, y: 0, width: 2000, height: 2100 },
-      "adv-event-zone": { x: 0, y: 0, width: 4000, height: 2300 },
-      "data-zone": { x: 0, y: -1300, width: 4000, height: 1000 },
-      "raw-ehr-data-zone": { x: 1500, y: -3800, width: 2500, height: 2400 },
-      "dili-analysis-zone": { x: 0, y: 6000, width: 4000, height: 5500 },
+      "task-management-zone": { x: -250, y: -2300, width: 2000, height: 2100 },
+      "retrieved-data-zone": { x: -250, y: -4600, width: 2000, height: 2100 },
+      "doctors-note-zone": { x: -250, y: 0, width: 2000, height: 2100 },
+      "adv-event-zone": { x: -1250, y: 3500, width: 4000, height: 2300 },
+      "data-zone": { x: -1500, y: 500, width: 4500, height: 1500 },
+      "raw-ehr-data-zone": { x: -2500, y: -5600, width: 6500, height: 4200 },
+      "dili-analysis-zone": { x: -1250, y: 7000, width: 4000, height: 5500 },
       "web-interface-zone": { x: -2200, y: 0, width: 2000, height: 1500 },
     };
 

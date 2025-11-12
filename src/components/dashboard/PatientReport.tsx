@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { Edit2, Save, X, Download, Printer, User, Calendar, Hash, Activity, AlertCircle, Pill, FileText, Stethoscope, ClipboardList, TrendingUp } from 'lucide-react';
 
@@ -369,16 +369,27 @@ interface PatientReportProps {
     causality: string;
     management_recommendations: string[];
   };
+  onUpdate?: (updatedData: any) => void;
 }
 
-const PatientReport: React.FC<PatientReportProps> = ({ patientData }) => {
+const PatientReport: React.FC<PatientReportProps> = ({ patientData, onUpdate }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editableData, setEditableData] = useState(patientData);
   const documentRef = useRef<HTMLDivElement>(null);
 
+  // Update editableData when patientData prop changes
+  useEffect(() => {
+    setEditableData(patientData);
+  }, [patientData]);
+
   const handleSave = () => {
     console.log('Saving document content:', editableData);
-    // Here you would save to backend
+    
+    // Call the onUpdate callback to persist changes to parent
+    if (onUpdate) {
+      onUpdate(editableData);
+    }
+    
     setIsEditMode(false);
   };
 

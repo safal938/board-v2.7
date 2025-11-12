@@ -3,7 +3,7 @@
     {
       "name": "adv-event-zone",
       "label": "Adverse Events Zone",
-      "x": 0,
+      "x": -1250,
       "y": 3500,
       "width": 4000,
       "height": 2300,
@@ -16,8 +16,8 @@
     {
       "name": "dili-analysis-zone",
       "label": "DILI Analysis & Reporting Zone",
-      "x": 0,
-      "y": 6000,
+      "x": -1250,
+      "y": 7000,
       "width": 4000,
       "height": 5500,
       "color": "#1E88E5",
@@ -42,7 +42,7 @@
     {
       "name": "data-zone",
       "label": "Data Zone- Encounter Wise Processed Data",
-      "x": -500,
+      "x": -1500,
       "y": 500,
       "width": 4500,
       "height": 1500,

@@ -218,11 +218,12 @@ export function BoardAppLegacy() {
         prev.map((item) => (item.id === id ? { ...item, ...updates } : item))
       );
 
-      // Sync updates to backend (height, noteData, content, etc.)
+      // Sync updates to backend (height, noteData, content, patientData, etc.)
       if (
         updates.height !== undefined ||
         updates.noteData !== undefined ||
-        updates.content !== undefined
+        updates.content !== undefined ||
+        updates.patientData !== undefined
       ) {
         fetch(`${API_BASE_URL}/api/board-items/${id}`, {
           method: "PUT",

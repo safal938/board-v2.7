@@ -951,6 +951,10 @@ const BoardItem = ({ item, isSelected, onUpdate, onDelete, onSelect, zoom = 1 })
         return (
           <PatientReport
             patientData={item.patientData || {}}
+            onUpdate={(updatedData) => {
+              console.log('Updating patient report data:', updatedData);
+              onUpdate(item.id, { patientData: updatedData });
+            }}
           />
         );
 
