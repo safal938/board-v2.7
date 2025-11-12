@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, CheckCircle, XCircle, X } from 'lucide-react';
@@ -27,23 +28,23 @@ const ModalOverlay = styled(motion.div)`
 
 const ModalContent = styled(motion.div)`
   background: white;
-  border-radius: 16px;
-  padding: 24px;
-  max-width: 500px;
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 600px;
   width: 90%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
   position: relative;
 `;
 
 const ModalHeader = styled.div<{ type: string }>`
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 16px;
+  margin-bottom: 24px;
   
   svg {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
     color: ${props => {
       switch (props.type) {
         case 'success': return '#10b981';
@@ -57,8 +58,8 @@ const ModalHeader = styled.div<{ type: string }>`
 
 const ModalTitle = styled.h3`
   margin: 0;
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 700;
   color: #1f2937;
   flex: 1;
 `;
@@ -90,30 +91,32 @@ const CloseButton = styled.button`
 
 const ModalMessage = styled.p`
   margin: 0;
-  font-size: 16px;
-  line-height: 1.5;
+  font-size: 18px;
+  line-height: 1.6;
   color: #4b5563;
 `;
 
 const ModalButton = styled.button`
-  margin-top: 20px;
+  margin-top: 32px;
   width: 100%;
-  padding: 12px 24px;
+  padding: 16px 32px;
   background: #3b82f6;
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 500;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
   
   &:hover {
     background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
   }
   
   &:active {
-    transform: scale(0.98);
+    transform: translateY(0);
   }
 `;
 
@@ -152,7 +155,7 @@ const AlertModal: React.FC<AlertModalProps> = ({
     }
   };
 
-  return (
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
         <ModalOverlay
@@ -185,6 +188,12 @@ const AlertModal: React.FC<AlertModalProps> = ({
         </ModalOverlay>
       )}
     </AnimatePresence>
+  );
+
+  // Render modal in a portal to ensure it's above everything
+  return ReactDOM.createPortal(
+    modalContent,
+    document.body
   );
 };
 

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import styled from "styled-components";
 import { motion } from "framer-motion";
+import { FileText, Activity } from "lucide-react";
 import LabResult from "./LabResult";
 import PatientContext from "./dashboard/PatientContext";
 import MedicationTimeline from "./dashboard/MedicationTimeline";
@@ -1014,9 +1015,55 @@ const BoardItem = ({ item, isSelected, onUpdate, onDelete, onSelect, zoom = 1 })
         return (
           <>
             <button
-              onClick={() => {
+              onClick={async () => {
                 if (item.buttonAction === "clearChats") {
                   setShowClearModal(true);
+                } else if (item.buttonAction === "generateDiagnosis") {
+                  try {
+                    console.log('🔬 Generating DILI Diagnosis...');
+                    const response = await fetch('https://api.medforce-ai.com/generate_diagnosis', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({})
+                    });
+                    const data = await response.json();
+                    console.log('✅ Diagnosis generated:', data);
+                    setAlertModal({
+                      isOpen: true,
+                      message: 'DILI Diagnosis generated successfully!',
+                      type: 'success'
+                    });
+                  } catch (error) {
+                    console.error('❌ Error generating diagnosis:', error);
+                    setAlertModal({
+                      isOpen: true,
+                      message: 'Failed to generate diagnosis. Please try again.',
+                      type: 'error'
+                    });
+                  }
+                } else if (item.buttonAction === "generateReport") {
+                  try {
+                    console.log('📄 Generating Patient Report...');
+                    const response = await fetch('https://api.medforce-ai.com/generate_report', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({})
+                    });
+                    const data = await response.json();
+                    console.log('✅ Report generated:', data);
+                    setAlertModal({
+                      isOpen: true,
+                      message: 'Patient Report generated successfully!',
+                      type: 'success'
+                    });
+                  } catch (error) {
+                    console.error('❌ Error generating report:', error);
+                    setAlertModal({
+                      isOpen: true,
+                      message: 'Failed to generate report. Please try again.',
+                      type: 'error'
+                    });
+                  }
                 }
               }}
               style={{
@@ -1027,7 +1074,7 @@ const BoardItem = ({ item, isSelected, onUpdate, onDelete, onSelect, zoom = 1 })
                 borderRadius: "8px",
                 background: item.buttonColor || "#dc2626",
                 color: "white",
-                fontSize: "13px",
+                fontSize: "20px",
                 fontWeight: "600",
                 cursor: "pointer",
                 boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
@@ -1035,7 +1082,7 @@ const BoardItem = ({ item, isSelected, onUpdate, onDelete, onSelect, zoom = 1 })
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: "6px",
+                gap: "8px",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "translateY(-1px)";
@@ -1046,8 +1093,14 @@ const BoardItem = ({ item, isSelected, onUpdate, onDelete, onSelect, zoom = 1 })
                 e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.15)";
               }}
             >
-              {item.buttonIcon && <span style={{ fontSize: "14px" }}>{item.buttonIcon}</span>}
-              {item.buttonText || "Button"}
+              {item.buttonAction === "generateReport" ? (
+                <FileText size={20} />
+              ) : item.buttonAction === "generateDiagnosis" ? (
+                <Activity size={20} />
+              ) : item.buttonIcon ? (
+                <span style={{ fontSize: "18px" }}>{item.buttonIcon}</span>
+              ) : null}
+             <span style={{ fontSize: "22px" }}> {item.buttonText || "Button"}</span> 
             </button>
 
             {/* Confirmation Modal */}
@@ -1078,7 +1131,7 @@ const BoardItem = ({ item, isSelected, onUpdate, onDelete, onSelect, zoom = 1 })
                   onClick={(e) => e.stopPropagation()}
                 >
                   <h2 style={{ margin: "0 0 16px 0", fontSize: "20px", fontWeight: "700", color: "#dc2626" }}>
-                    ⚠️ Clear Chat History
+                     Clear Chat History
                   </h2>
                   <p style={{ margin: "0 0 24px 0", fontSize: "14px", color: "#374151", lineHeight: "1.5" }}>
                     Are you sure you want to clear all chat history? This action cannot be undone.
