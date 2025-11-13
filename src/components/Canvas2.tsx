@@ -1365,14 +1365,22 @@ function Canvas2() {
           }
         });
 
-        es.addEventListener('board-reloaded', (event: any) => {
+        es.addEventListener('board-reloaded', async (event: any) => {
           try {
             const data = JSON.parse(event.data);
             console.log('🔄 Board reloaded event received:', data.message);
-            console.log('🔃 Refreshing page to load updated board items...');
+            console.log('🔃 Fetching updated board items...');
             
-            // Reload the page to get fresh data from Redis
-            window.location.reload();
+            // Fetch fresh data from Redis without page reload
+            const response = await fetch(`${API_BASE_URL}/api/board-items`);
+            if (response.ok) {
+              const freshItems = await response.json();
+              console.log(`✅ Loaded ${freshItems.length} fresh items from server`);
+              setItems(freshItems);
+              // The useEffect that watches 'items' will rebuild nodes and edges
+            } else {
+              console.error('❌ Failed to fetch fresh board items');
+            }
           } catch (err) {
             console.error('❌ Error handling board-reloaded event:', err);
           }
@@ -2356,9 +2364,7 @@ function Canvas2() {
               <ul style={{ margin: '0', paddingLeft: '20px', color: '#991b1b', fontSize: '14px', lineHeight: 1.8 }}>
                 <li>Delete dynamic items (todos, notes, images, agent results)</li>
                 <li>Reset ALL item positions to default</li>
-                <li>Clear EASL conversation history</li>
-                <li>Reload board from static file</li>
-                <li>Refresh all connected browser tabs</li>
+                <li>Clear Chat conversation history</li>
               </ul>
             </div>
             
