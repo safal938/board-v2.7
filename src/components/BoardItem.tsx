@@ -403,10 +403,11 @@ const BoardItem = ({ item, isSelected, onUpdate, onDelete, onSelect, zoom = 1 })
   const [isDragging, setIsDragging] = useState(false);
   const [lastPosition, setLastPosition] = useState({ x: item.x, y: item.y });
   const [showClearModal, setShowClearModal] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [alertModal, setAlertModal] = useState<{
     isOpen: boolean;
     message: string;
-    type: 'success' | 'error' | 'warning' | 'info';
+    type: 'success' | 'error' | 'warning' | 'info' | 'loading';
   }>({
     isOpen: false,
     message: '',
@@ -1019,26 +1020,52 @@ const BoardItem = ({ item, isSelected, onUpdate, onDelete, onSelect, zoom = 1 })
         return (
           <>
             <button
+              disabled={isProcessing}
               onClick={async () => {
+                if (isProcessing) return;
+                
                 if (item.buttonAction === "clearChats") {
                   setShowClearModal(true);
                 } else if (item.buttonAction === "generateDiagnosis") {
                   try {
                     console.log('🔬 Generating DILI Diagnosis...');
-                    const response = await fetch('https://api.medforce-ai.com/generate_diagnosis', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({})
-                    });
-                    const data = await response.json();
-                    console.log('✅ Diagnosis generated:', data);
+                    setIsProcessing(true);
+                    
+                    // Show loading modal
                     setAlertModal({
                       isOpen: true,
-                      message: 'DILI Diagnosis generated successfully!',
+                      message: 'Generating DILI Diagnosis... Please wait.',
+                      type: 'loading'
+                    });
+                    
+                    // Get API base URL from environment or default
+                    const API_BASE_URL = 'https://api.medforce-ai.com';
+                    
+                    const response = await fetch(`${API_BASE_URL}/generate_diagnosis`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        zone: 'dili-analysis-zone'
+                      })
+                    });
+                    
+                    if (!response.ok) {
+                      throw new Error('Failed to generate diagnosis');
+                    }
+                    
+                    const data = await response.json();
+                    console.log('✅ Diagnosis generated:', data);
+                    
+                    // Close loading modal - the SSE will handle navigation
+                    setAlertModal({
+                      isOpen: false,
+                      message: '',
                       type: 'success'
                     });
+                    setIsProcessing(false);
                   } catch (error) {
                     console.error('❌ Error generating diagnosis:', error);
+                    setIsProcessing(false);
                     setAlertModal({
                       isOpen: true,
                       message: 'Failed to generate diagnosis. Please try again.',
@@ -1048,20 +1075,43 @@ const BoardItem = ({ item, isSelected, onUpdate, onDelete, onSelect, zoom = 1 })
                 } else if (item.buttonAction === "generateReport") {
                   try {
                     console.log('📄 Generating Patient Report...');
-                    const response = await fetch('https://api.medforce-ai.com/generate_report', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({})
-                    });
-                    const data = await response.json();
-                    console.log('✅ Report generated:', data);
+                    setIsProcessing(true);
+                    
+                    // Show loading modal
                     setAlertModal({
                       isOpen: true,
-                      message: 'Patient Report generated successfully!',
+                      message: 'Generating Patient Report... Please wait.',
+                      type: 'loading'
+                    });
+                    
+                    // Get API base URL from environment or default
+                    const API_BASE_URL = 'https://api.medforce-ai.com';
+                    
+                    const response = await fetch(`${API_BASE_URL}/generate_report`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        zone: 'patient-report-zone'
+                      })
+                    });
+                    
+                    if (!response.ok) {
+                      throw new Error('Failed to generate report');
+                    }
+                    
+                    const data = await response.json();
+                    console.log('✅ Report generated:', data);
+                    
+                    // Close loading modal - the SSE will handle navigation
+                    setAlertModal({
+                      isOpen: false,
+                      message: '',
                       type: 'success'
                     });
+                    setIsProcessing(false);
                   } catch (error) {
                     console.error('❌ Error generating report:', error);
+                    setIsProcessing(false);
                     setAlertModal({
                       isOpen: true,
                       message: 'Failed to generate report. Please try again.',
@@ -1092,25 +1142,30 @@ const BoardItem = ({ item, isSelected, onUpdate, onDelete, onSelect, zoom = 1 })
                 padding: "8px 16px",
                 border: "none",
                 borderRadius: "8px",
-                background: item.buttonColor || "#dc2626",
+                background: isProcessing ? "#9ca3af" : (item.buttonColor || "#dc2626"),
                 color: "white",
                 fontSize: "20px",
                 fontWeight: "600",
-                cursor: "pointer",
+                cursor: isProcessing ? "not-allowed" : "pointer",
                 boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
                 transition: "all 0.2s ease",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 gap: "8px",
+                opacity: isProcessing ? 0.6 : 1,
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-1px)";
-                e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.25)";
+                if (!isProcessing) {
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.25)";
+                }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.15)";
+                if (!isProcessing) {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.15)";
+                }
               }}
             >
               {item.buttonAction === "generateReport" ? (
