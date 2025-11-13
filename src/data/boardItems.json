@@ -2207,10 +2207,25 @@
     "updatedAt": "2025-11-10T16:00:00.000Z"
   },
   {
+    "id": "dashboard-item-share-to-hepato-button",
+    "type": "button",
+    "x": 200,
+    "y": 10150,
+    "width": 650,
+    "height": 50,
+    "buttonText": "Share the board to hepato",
+    "buttonIcon": "",
+    "buttonColor": "#2196F3",
+    "buttonAction": "shareToHepato",
+    "showHandles": true,
+    "createdAt": "2025-11-10T16:00:00.000Z",
+    "updatedAt": "2025-11-10T16:00:00.000Z"
+  },
+  {
     "id": "dashboard-item-generate-report-button",
     "type": "button",
-    "x": 750,
-    "y": 7100,
+    "x": 200,
+    "y": 10800,
     "width": 650,
     "height": 50,
     "buttonText": "Generate Patient Report",

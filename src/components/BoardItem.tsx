@@ -767,7 +767,7 @@ const BoardItem = ({ item, isSelected, onUpdate, onDelete, onSelect, zoom = 1 })
         return (
           <AgentCard>
             <AgentHeader>
-              <AgentTitle>🤖 {agent.title || "Agent Result"}</AgentTitle>
+              <AgentTitle> {agent.title || "Agent Result"}</AgentTitle>
             </AgentHeader>
             <AgentBody>
               {/* Render simple markdown */}
@@ -1065,6 +1065,22 @@ const BoardItem = ({ item, isSelected, onUpdate, onDelete, onSelect, zoom = 1 })
                     setAlertModal({
                       isOpen: true,
                       message: 'Failed to generate report. Please try again.',
+                      type: 'error'
+                    });
+                  }
+                } else if (item.buttonAction === "shareToHepato") {
+                  try {
+                    console.log('🔗 Sharing board to hepato...');
+                    setAlertModal({
+                      isOpen: true,
+                      message: 'Board shared to hepato successfully!',
+                      type: 'success'
+                    });
+                  } catch (error) {
+                    console.error('❌ Error sharing to hepato:', error);
+                    setAlertModal({
+                      isOpen: true,
+                      message: 'Failed to share to hepato. Please try again.',
                       type: 'error'
                     });
                   }

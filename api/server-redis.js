@@ -1261,7 +1261,11 @@ app.post("/api/agents", async (req, res) => {
       "adv-event-zone": { x: -1250, y: 3500, width: 4000, height: 2300 },
       "data-zone": { x: -1500, y: 500, width: 4500, height: 1500 },
       "raw-ehr-data-zone": { x: -2500, y: -5600, width: 6500, height: 4200 },
-      "dili-analysis-zone": { x: -1250, y: 7000, width: 4000, height: 5500 },
+      "dili-analysis-zone": { x: -625, y: 7000, width: 2750, height: 2800 },
+      "share-hepatologist-zone": { x: -625, y: 10000, width: 2750, height: 500 },
+      "patient-report-zone": { x: -625, y: 10700, width: 2750, height: 2800 },
+      "push-to-ehr-zone": { x: -625, y: 13700, width: 2750, height: 500 },
+      "patient-action-zone": { x: -625, y: 14400, width: 2750, height: 1200 },
       "web-interface-zone": { x: -2200, y: 0, width: 2000, height: 1500 },
     };
 
@@ -2655,7 +2659,11 @@ app.post("/api/dili-diagnostic", async (req, res) => {
       "adv-event-zone": { x: -1250, y: 3500, width: 4000, height: 2300 },
       "data-zone": { x: -1500, y: 500, width: 4500, height: 1500 },
       "raw-ehr-data-zone": { x: -2500, y: -5600, width: 6500, height: 4200 },
-      "dili-analysis-zone": { x: -1250, y: 7000, width: 4000, height: 5500 },
+      "dili-analysis-zone": { x: -625, y: 7000, width: 2750, height: 2800 },
+      "share-hepatologist-zone": { x: -625, y: 10000, width: 2750, height: 500 },
+      "patient-report-zone": { x: -625, y: 10700, width: 2750, height: 2800 },
+      "push-to-ehr-zone": { x: -625, y: 13700, width: 2750, height: 500 },
+      "patient-action-zone": { x: -625, y: 14400, width: 2750, height: 1200 },
       "web-interface-zone": { x: -2200, y: 0, width: 2000, height: 1500 },
     };
 
@@ -2754,7 +2762,11 @@ app.post("/api/patient-report", async (req, res) => {
       "adv-event-zone": { x: -1250, y: 3500, width: 4000, height: 2300 },
       "data-zone": { x: -1500, y: 500, width: 4500, height: 1500 },
       "raw-ehr-data-zone": { x: -2500, y: -5600, width: 6500, height: 4200 },
-      "dili-analysis-zone": { x: -1250, y: 7000, width: 4000, height: 5500 },
+      "dili-analysis-zone": { x: -625, y: 7000, width: 2750, height: 2800 },
+      "share-hepatologist-zone": { x: -625, y: 10000, width: 2750, height: 500 },
+      "patient-report-zone": { x: -625, y: 10700, width: 2750, height: 2800 },
+      "push-to-ehr-zone": { x: -625, y: 13700, width: 2750, height: 500 },
+      "patient-action-zone": { x: -625, y: 14400, width: 2750, height: 1200 },
       "web-interface-zone": { x: -2200, y: 0, width: 2000, height: 1500 },
     };
 
@@ -2781,11 +2793,13 @@ app.post("/api/patient-report", async (req, res) => {
       itemY = zonePosition.y;
       console.log(`📍 Auto-positioned Patient Report in ${zone} at (${itemX}, ${itemY})`);
     } else {
+      // Default to Patient Report Zone
+      const targetZone = zoneConfig["patient-report-zone"];
       const tempItem = { type: "patient-report", width: itemWidth, height: itemHeight };
-      const taskPosition = findTaskZonePosition(tempItem, existingItems);
-      itemX = taskPosition.x;
-      itemY = taskPosition.y;
-      console.log(`📍 Auto-positioned Patient Report in Task Management Zone at (${itemX}, ${itemY})`);
+      const zonePosition = findPositionInZone(tempItem, existingItems, targetZone);
+      itemX = zonePosition.x;
+      itemY = zonePosition.y;
+      console.log(`📍 Auto-positioned Patient Report in Patient Report Zone (default) at (${itemX}, ${itemY})`);
     }
 
     const newItem = {
