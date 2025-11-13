@@ -406,18 +406,57 @@ function CustomNode({ data }: NodeProps) {
 // Custom node component that renders board items using the actual BoardItem component
 function CustomBoardNode({ data }: NodeProps) {
   const item = data.item;
+  const isButton = item.type === 'button';
+  const showHandles = item.showHandles === true;
   
   return (
-    <NodeWrapper>
-      <BoardItem
-        item={item}
-        isSelected={data.isSelected || false}
-        onUpdate={data.onUpdate}
-        onDelete={data.onDelete}
-        onSelect={data.onSelect}
-        zoom={1}
-      />
-    </NodeWrapper>
+    <>
+      {/* Add connection handles for button items that have showHandles enabled */}
+      {isButton && showHandles && (
+        <>
+          <Handle 
+            type="target" 
+            position={Position.Top} 
+            id="top"
+            style={{ 
+              background: item.buttonColor || '#2196F3', 
+              width: 16, 
+              height: 16,
+              border: '3px solid white',
+              top: -8,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              pointerEvents: 'all'
+            }} 
+          />
+          <Handle 
+            type="source" 
+            position={Position.Bottom} 
+            id="bottom"
+            style={{ 
+              background: item.buttonColor || '#2196F3', 
+              width: 16, 
+              height: 16,
+              border: '3px solid white',
+              bottom: -8,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              pointerEvents: 'all'
+            }} 
+          />
+        </>
+      )}
+      <NodeWrapper>
+        <BoardItem
+          item={item}
+          isSelected={data.isSelected || false}
+          onUpdate={data.onUpdate}
+          onDelete={data.onDelete}
+          onSelect={data.onSelect}
+          zoom={1}
+        />
+      </NodeWrapper>
+    </>
   );
 }
 
@@ -1081,6 +1120,36 @@ function Canvas2() {
             id: 'edge-adverse-analyzer-to-adverse-zone',
             source: 'adverse-event-consolidator',
             target: 'zone-adv-event-zone',
+            targetHandle: 'top',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#2196F3', strokeWidth: 6 },
+          },
+          // Adverse Events Zone → DILI Analysis Zone
+          {
+            id: 'edge-adverse-zone-to-dili',
+            source: 'zone-adv-event-zone',
+            sourceHandle: 'bottom',
+            target: 'zone-dili-analysis-zone',
+            targetHandle: 'top',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#2196F3', strokeWidth: 6 },
+          },
+          // DILI Analysis Zone → Share Button → Patient Report Zone
+          {
+            id: 'edge-dili-to-share-button',
+            source: 'zone-dili-analysis-zone',
+            sourceHandle: 'bottom',
+            target: 'dashboard-item-share-to-hepato-button',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#2196F3', strokeWidth: 6 },
+          },
+          {
+            id: 'edge-share-button-to-patient-report',
+            source: 'dashboard-item-share-to-hepato-button',
+            target: 'zone-patient-report-zone',
             targetHandle: 'top',
             type: 'default',
             animated: true,

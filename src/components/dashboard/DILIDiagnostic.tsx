@@ -34,10 +34,6 @@ const TwoColumnLayout = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
-  
-  @media (max-width: 1200px) {
-    grid-template-columns: 1fr;
-  }
 `;
 
 const LeftColumn = styled.div`

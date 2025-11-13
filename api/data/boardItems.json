@@ -2195,7 +2195,7 @@
   {
     "id": "dashboard-item-generate-diagnosis-button",
     "type": "button",
-    "x": -50,
+    "x": 400,
     "y": 7100,
     "width": 650,
     "height": 50,
@@ -2207,16 +2207,46 @@
     "updatedAt": "2025-11-10T16:00:00.000Z"
   },
   {
+    "id": "dashboard-item-share-to-hepato-button",
+    "type": "button",
+    "x": 425,
+    "y": 10150,
+    "width": 650,
+    "height": 50,
+    "buttonText": "Share the board to hepato",
+    "buttonIcon": "",
+    "buttonColor": "#2196F3",
+    "buttonAction": "shareToHepato",
+    "showHandles": true,
+    "createdAt": "2025-11-10T16:00:00.000Z",
+    "updatedAt": "2025-11-10T16:00:00.000Z"
+  },
+  {
     "id": "dashboard-item-generate-report-button",
     "type": "button",
-    "x": 750,
-    "y": 7100,
+    "x": 425,
+    "y": 10800,
     "width": 650,
     "height": 50,
     "buttonText": "Generate Patient Report",
     "buttonIcon": "",
     "buttonColor": "#1E88E5",
     "buttonAction": "generateReport",
+    "createdAt": "2025-11-10T16:00:00.000Z",
+    "updatedAt": "2025-11-10T16:00:00.000Z"
+  },
+  {
+    "id": "dashboard-item-push-to-ehr",
+    "type": "button",
+    "x": 425,
+    "y": 10150,
+    "width": 650,
+    "height": 50,
+    "buttonText": "Push to EHR",
+    "buttonIcon": "",
+    "buttonColor": "#2196F3",
+    "buttonAction": "pushtoEHR",
+    "showHandles": true,
     "createdAt": "2025-11-10T16:00:00.000Z",
     "updatedAt": "2025-11-10T16:00:00.000Z"
   }

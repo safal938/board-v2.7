@@ -17,6 +17,7 @@ Click the **X button** (bottom right) in the canvas interface.
 ```bash
 curl -X POST http://localhost:3001/api/reload-board-items
 ```
+curl -X POST https://board-v26.vercel.app/api/reload-board-items
 
 **What it does:**
 - Loads items from `api/data/boardItems.json`
