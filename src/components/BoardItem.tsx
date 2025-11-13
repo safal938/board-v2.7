@@ -940,23 +940,41 @@ const BoardItem = ({ item, isSelected, onUpdate, onDelete, onSelect, zoom = 1 })
 
       case "dili-diagnostic":
         return (
-          <DILIDiagnostic
-            pattern={item.diliData?.pattern || {}}
-            causality={item.diliData?.causality || {}}
-            severity={item.diliData?.severity || {}}
-            management={item.diliData?.management || {}}
-          />
+          <div style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "flex-start",
+            overflow: "auto"
+          }}>
+            <DILIDiagnostic
+              pattern={item.diliData?.pattern || {}}
+              causality={item.diliData?.causality || {}}
+              severity={item.diliData?.severity || {}}
+              management={item.diliData?.management || {}}
+            />
+          </div>
         );
 
       case "patient-report":
         return (
-          <PatientReport
-            patientData={item.patientData || {}}
-            onUpdate={(updatedData) => {
-              console.log('Updating patient report data:', updatedData);
-              onUpdate(item.id, { patientData: updatedData });
-            }}
-          />
+          <div style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "flex-start",
+            overflow: "auto"
+          }}>
+            <PatientReport
+              patientData={item.patientData || {}}
+              onUpdate={(updatedData) => {
+                console.log('Updating patient report data:', updatedData);
+                onUpdate(item.id, { patientData: updatedData });
+              }}
+            />
+          </div>
         );
 
       case "iframe":
@@ -1123,14 +1141,46 @@ const BoardItem = ({ item, isSelected, onUpdate, onDelete, onSelect, zoom = 1 })
                     console.log('🔗 Sharing board to hepato...');
                     setAlertModal({
                       isOpen: true,
-                      message: 'Board shared to hepato successfully!',
+                      message: 'Board shared to hepatologist successfully!',
                       type: 'success'
                     });
                   } catch (error) {
                     console.error('❌ Error sharing to hepato:', error);
                     setAlertModal({
                       isOpen: true,
-                      message: 'Failed to share to hepato. Please try again.',
+                      message: 'Failed to share to hepatologist. Please try again.',
+                      type: 'error'
+                    });
+                  }
+                } else if (item.buttonAction === "declineHepato") {
+                  try {
+                    console.log('❌ Declining hepato referral...');
+                    setAlertModal({
+                      isOpen: true,
+                      message: 'Hepatology referral declined. Case will be managed locally.',
+                      type: 'warning'
+                    });
+                  } catch (error) {
+                    console.error('❌ Error declining referral:', error);
+                    setAlertModal({
+                      isOpen: true,
+                      message: 'Failed to decline referral. Please try again.',
+                      type: 'error'
+                    });
+                  }
+                } else if (item.buttonAction === "pushToEHR") {
+                  try {
+                    console.log('📤 Pushing to EHR...');
+                    setAlertModal({
+                      isOpen: true,
+                      message: 'Patient report successfully pushed to EHR system!',
+                      type: 'success'
+                    });
+                  } catch (error) {
+                    console.error('❌ Error pushing to EHR:', error);
+                    setAlertModal({
+                      isOpen: true,
+                      message: 'Failed to push to EHR. Please try again.',
                       type: 'error'
                     });
                   }

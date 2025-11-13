@@ -16,7 +16,7 @@ import ReactFlow, {
 } from 'reactflow';
 import styled from 'styled-components';
 import 'reactflow/dist/style.css';
-import { FileText, Image as ImageIcon, X, Plus, Mic, MicOff, Layers, Zap, Activity, Database, AlertTriangle, GitMerge, MessageSquare } from 'lucide-react';
+import { FileText, Image as ImageIcon, X, Plus, Mic, MicOff, Layers, Zap, Activity, Database, AlertTriangle, GitMerge, MessageSquare, Stethoscope, ShieldAlert, UserCheck, ClipboardCheck } from 'lucide-react';
 import zoneConfig from '../data/zone-config.json';
 import boardItemsData from '../data/boardItems.json';
 import BoardItem from './BoardItem';
@@ -351,40 +351,78 @@ function CustomNode({ data }: NodeProps) {
   const getIcon = () => {
     switch (data.icon) {
       case 'database':
-        return <GitMerge size={80} color="white" strokeWidth={3} />;
+        return <Database size={80} color="white" strokeWidth={3} />;
       case 'activity':
-        return <AlertTriangle size={80} color="white" strokeWidth={3} />;
+        return <Activity size={80} color="white" strokeWidth={3} />;
       case 'merge':
         return <GitMerge size={80} color="white" strokeWidth={3} />;
       case 'alert':
         return <AlertTriangle size={80} color="white" strokeWidth={3} />;
+      case 'file-text':
+        return <FileText size={80} color="white" strokeWidth={3} />;
+      case 'stethoscope':
+        return <Stethoscope size={80} color="white" strokeWidth={3} />;
+      case 'shield-alert':
+        return <ShieldAlert size={80} color="white" strokeWidth={3} />;
+      case 'user-check':
+        return <UserCheck size={80} color="white" strokeWidth={3} />;
+      case 'clipboard-check':
+        return <ClipboardCheck size={80} color="white" strokeWidth={3} />;
       default:
         return <Layers size={80} color="white" strokeWidth={3} />;
     }
   };
 
+  // Determine which handles to show based on handlePosition
+  const handlePosition = data.handlePosition || 'both';
+  
+  // If handlePosition is 'both', show top and bottom
+  // If it's 'right', show top, bottom, AND right
+  // If it's a specific position, show that plus top/bottom for flow
+  const showTopHandle = handlePosition === 'both' || handlePosition === 'right' || handlePosition === 'top';
+  const showBottomHandle = handlePosition === 'both' || handlePosition === 'right' || handlePosition === 'bottom';
+  const showRightHandle = handlePosition === 'right';
+  const showLeftHandle = handlePosition === 'left';
+
+  const handleStyle = {
+    background: data.color || '#e5e7eb',
+    width: 32,
+    height: 32,
+    border: '6px solid white',
+  };
+
   return (
     <CustomNodeContainer color={data.color}>
-      <Handle 
-        type="target" 
-        position={Position.Top}
-        style={{
-          background: data.color || '#e5e7eb',
-          width: 32,
-          height: 32,
-          border: '6px solid white',
-        }}
-      />
-      <Handle 
-        type="source" 
-        position={Position.Bottom}
-        style={{
-          background: data.color || '#e5e7eb',
-          width: 32,
-          height: 32,
-          border: '6px solid white',
-        }}
-      />
+      {showTopHandle && (
+        <Handle 
+          type="target" 
+          position={Position.Top}
+          style={handleStyle}
+        />
+      )}
+      {showBottomHandle && (
+        <Handle 
+          type="source" 
+          position={Position.Bottom}
+          style={handleStyle}
+        />
+      )}
+      {showRightHandle && (
+        <Handle 
+          type="source" 
+          position={Position.Right}
+          id="right"
+          style={handleStyle}
+        />
+      )}
+      {showLeftHandle && (
+        <Handle 
+          type="target" 
+          position={Position.Left}
+          id="left"
+          style={handleStyle}
+        />
+      )}
       
       <CustomNodeIconContainer color={data.color}>
         {getIcon()}
@@ -409,41 +447,79 @@ function CustomBoardNode({ data }: NodeProps) {
   const isButton = item.type === 'button';
   const showHandles = item.showHandles === true;
   
+  // Determine which handles to show based on handlePosition
+  const handlePosition = item.handlePosition || 'both';
+  const positions = typeof handlePosition === 'string' ? handlePosition.split(',').map(p => p.trim()) : [];
+  const hasTopHandle = positions.includes('top') || positions.includes('both') || handlePosition === 'both';
+  const hasBottomHandle = positions.includes('bottom') || positions.includes('both') || handlePosition === 'both';
+  const hasRightHandle = positions.includes('right');
+  const hasLeftHandle = positions.includes('left');
+  
+  const handleStyle = {
+    background: item.buttonColor || '#2196F3', 
+    width: 16, 
+    height: 16,
+    border: '3px solid white',
+    pointerEvents: 'all' as const
+  };
+  
   return (
     <>
       {/* Add connection handles for button items that have showHandles enabled */}
       {isButton && showHandles && (
         <>
-          <Handle 
-            type="target" 
-            position={Position.Top} 
-            id="top"
-            style={{ 
-              background: item.buttonColor || '#2196F3', 
-              width: 16, 
-              height: 16,
-              border: '3px solid white',
-              top: -8,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              pointerEvents: 'all'
-            }} 
-          />
-          <Handle 
-            type="source" 
-            position={Position.Bottom} 
-            id="bottom"
-            style={{ 
-              background: item.buttonColor || '#2196F3', 
-              width: 16, 
-              height: 16,
-              border: '3px solid white',
-              bottom: -8,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              pointerEvents: 'all'
-            }} 
-          />
+          {hasTopHandle && (
+            <Handle 
+              type="target" 
+              position={Position.Top} 
+              id="top"
+              style={{ 
+                ...handleStyle,
+                top: -8,
+                left: '50%',
+                transform: 'translateX(-50%)',
+              }} 
+            />
+          )}
+          {hasBottomHandle && (
+            <Handle 
+              type="source" 
+              position={Position.Bottom} 
+              id="bottom"
+              style={{ 
+                ...handleStyle,
+                bottom: -8,
+                left: '50%',
+                transform: 'translateX(-50%)',
+              }} 
+            />
+          )}
+          {hasLeftHandle && (
+            <Handle 
+              type="target" 
+              position={Position.Left} 
+              id="left"
+              style={{ 
+                ...handleStyle,
+                left: -8,
+                top: '50%',
+                transform: 'translateY(-50%)',
+              }} 
+            />
+          )}
+          {hasRightHandle && (
+            <Handle 
+              type="source" 
+              position={Position.Right} 
+              id="right"
+              style={{ 
+                ...handleStyle,
+                right: -8,
+                top: '50%',
+                transform: 'translateY(-50%)',
+              }} 
+            />
+          )}
         </>
       )}
       <NodeWrapper>
@@ -924,11 +1000,11 @@ function Canvas2() {
             label: 'Clinical Data Integrator',
             content: 'The whole EHR data from all the patient visits are integrated and significant findings are visually represented.',
             color: '#2196F3',
-            icon: 'merge',
+            icon: 'database',
             badge: 'Consolidated'
           },
-          draggable: true,
-          selectable: true,
+          draggable: false,
+          selectable: false,
           zIndex: 0,
         };
 
@@ -948,59 +1024,62 @@ function Canvas2() {
             icon: 'alert',
             badge: 'Analyzed'
           },
-          draggable: true,
-          selectable: true,
+          draggable: false,
+          selectable: false,
+          zIndex: 0,
+        };
+
+        // Create consolidator node between adverse-events-zone and dili-analysis-zone
+        // Adverse events zone: y: 3500 to 5800 (bottom at 5800)
+        // DILI analysis zone: y: 7000 to 9800 (top at 7000)
+        // Middle point: (5800 + 7000) / 2 = 6400
+        // Adjust for node height (approx 400px): 6400 - 200 = 6200
+        const diliConsolidatorNode: Node = {
+          id: 'dili-consolidator',
+          type: 'custom',
+          position: { x: 360, y: 6150 },
+          data: {
+            label: 'DILI Assessment Agent',
+            content: 'Reviews reported hepatic events to support structured DILI evaluation.',
+            color: '#1E88E5',
+            icon: 'stethoscope',
+            badge: 'Processing'
+          },
+          draggable: false,
+          selectable: false,
+          zIndex: 0,
+        };
+
+       
+        const reportConsolidatorNode: Node = {
+          id: 'report-consolidator',
+          type: 'custom',
+          position: { x: 360, y: 10400 },
+          data: {
+            label: 'Hepatology Expert Agent',
+            content: 'Clinical decision point for hepatology referral and patient report generation.',
+            color: '#2196F3',
+            icon: 'user-check',
+            badge: 'Ready',
+            showHandles: true,
+            handlePosition: 'right'
+          },
+          draggable: false,
+          selectable: false,
           zIndex: 0,
         };
 
         console.log('🎨 Creating nodes:', {
           zones: zoneNodes.length,
           items: itemNodes.length,
-          consolidators: 2,
-          total: zoneNodes.length + itemNodes.length + 2
+          consolidators: 4,
+          total: zoneNodes.length + itemNodes.length + 4
         });
         
-        setNodes([...zoneNodes, dataConsolidatorNode, adverseEventConsolidatorNode, ...itemNodes]);
+        setNodes([...zoneNodes, dataConsolidatorNode, adverseEventConsolidatorNode, diliConsolidatorNode, reportConsolidatorNode, ...itemNodes]);
 
         // Create edges for triage flow connections
-        const triageEdges: Edge[] = [
-          // Triage Inbox to ALF Category
-          {
-            id: 'edge-triage-to-alf',
-            source: 'triage-node-main',
-            target: 'triage-node-category-alf',
-            type: 'smoothstep',
-            animated: true,
-            style: { stroke: '#00897b', strokeWidth: 2 },
-          },
-          // Triage Inbox to SAH Category
-          {
-            id: 'edge-triage-to-sah',
-            source: 'triage-node-main',
-            target: 'triage-node-category-sah',
-            type: 'smoothstep',
-            animated: true,
-            style: { stroke: '#00897b', strokeWidth: 2 },
-          },
-          // ALF Category to ALF Grid
-          {
-            id: 'edge-alf-to-grid',
-            source: 'triage-node-category-alf',
-            target: 'triage-node-grid-alf',
-            type: 'smoothstep',
-            animated: true,
-            style: { stroke: '#26a69a', strokeWidth: 2 },
-          },
-          // SAH Category to SAH Grid
-          {
-            id: 'edge-sah-to-grid',
-            source: 'triage-node-category-sah',
-            target: 'triage-node-grid-sah',
-            type: 'smoothstep',
-            animated: true,
-            style: { stroke: '#26a69a', strokeWidth: 2 },
-          },
-        ];
+     
 
         // Create edges for encounter document connections (1→2→3→4→5→6)
         const encounterEdges: Edge[] = [
@@ -1125,18 +1204,87 @@ function Canvas2() {
             animated: true,
             style: { stroke: '#2196F3', strokeWidth: 6 },
           },
-          // Adverse Events Zone → DILI Analysis Zone
+          // Adverse Events Zone → DILI Consolidator → DILI Analysis Zone
           {
-            id: 'edge-adverse-zone-to-dili',
+            id: 'edge-adverse-zone-to-dili-consolidator',
             source: 'zone-adv-event-zone',
             sourceHandle: 'bottom',
+            target: 'dili-consolidator',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#2196F3', strokeWidth: 6 },
+          },
+          {
+            id: 'edge-dili-consolidator-to-dili-zone',
+            source: 'dili-consolidator',
             target: 'zone-dili-analysis-zone',
+            targetHandle: 'top',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#1E88E5', strokeWidth: 6 },
+          },
+          // DILI Analysis Zone → Report Consolidator → Patient Report Zone
+          {
+            id: 'edge-dili-to-report-consolidator',
+            source: 'zone-dili-analysis-zone',
+            sourceHandle: 'bottom',
+            target: 'report-consolidator',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#2196F3', strokeWidth: 6 },
+          },
+          {
+            id: 'edge-report-consolidator-to-patient-report',
+            source: 'report-consolidator',
+            target: 'zone-patient-report-zone',
             targetHandle: 'top',
             type: 'default',
             animated: true,
             style: { stroke: '#2196F3', strokeWidth: 6 },
           },
-          // DILI Analysis Zone → Share Button → Patient Report Zone
+          // Report Consolidator → Review Report Button
+          {
+            id: 'edge-consolidator-to-review-button',
+            source: 'report-consolidator',
+            sourceHandle: 'right',
+            target: 'report-hub-review-button',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#4CAF50', strokeWidth: 4 },
+          },
+          // Report Consolidator → Export Report Button
+          {
+            id: 'edge-consolidator-to-export-button',
+            source: 'report-consolidator',
+            sourceHandle: 'right',
+            target: 'report-hub-export-button',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#FF9800', strokeWidth: 4 },
+          },
+          // Report Consolidator → Share Board to Hepato Button
+          {
+            id: 'edge-consolidator-to-share-hepato',
+            source: 'report-consolidator',
+            sourceHandle: 'right',
+            target: 'dashboard-item-share-board-to-hepato',
+            targetHandle: 'left',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#2196F3', strokeWidth: 4 },
+          },
+          // Report Consolidator → Decline Hepato Referral Button
+          {
+            id: 'edge-consolidator-to-decline-hepato',
+            source: 'report-consolidator',
+            sourceHandle: 'right',
+            target: 'dashboard-item-hepato-referal-decline',
+            targetHandle: 'left',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#F44336', strokeWidth: 4 },
+          },
+          // Keep original share button connection for backward compatibility
           {
             id: 'edge-dili-to-share-button',
             source: 'zone-dili-analysis-zone',
@@ -1144,7 +1292,7 @@ function Canvas2() {
             target: 'dashboard-item-share-to-hepato-button',
             type: 'default',
             animated: true,
-            style: { stroke: '#2196F3', strokeWidth: 6 },
+            style: { stroke: '#2196F3', strokeWidth: 3, strokeDasharray: '5,5' },
           },
           {
             id: 'edge-share-button-to-patient-report',
@@ -1153,7 +1301,7 @@ function Canvas2() {
             targetHandle: 'top',
             type: 'default',
             animated: true,
-            style: { stroke: '#2196F3', strokeWidth: 6 },
+            style: { stroke: '#2196F3', strokeWidth: 3, strokeDasharray: '5,5' },
           },
           // Patient Report Zone → Push to EHR Button
           {
@@ -1207,7 +1355,7 @@ function Canvas2() {
           },
         ];
         
-        setEdges([...triageEdges, ...encounterEdges, ...ehrHubEdges, ...consolidatorEdges]);
+        setEdges([ ...encounterEdges, ...ehrHubEdges, ...consolidatorEdges]);
       } catch (error) {
         console.error('❌ Error loading items:', error);
       }
@@ -1236,7 +1384,7 @@ function Canvas2() {
         });
 
         es.addEventListener('ping', (event: any) => {
-          console.log('💓 SSE heartbeat');
+          console.log(' SSE heartbeat');
         });
 
         es.addEventListener('focus', (event: any) => {
@@ -1797,6 +1945,53 @@ function Canvas2() {
     };
   }, [compressAndUploadImage]);
 
+  // Delete selected item function
+  const handleDeleteSelectedItem = useCallback(async () => {
+    if (!selectedItemId) return;
+    
+    try {
+      console.log(`🗑️ Deleting selected item: ${selectedItemId}`);
+      setShowResetModal(false);
+      setIsDeleting(true);
+      
+      // Delete the selected item
+      const response = await fetch(`${API_BASE_URL}/api/board-items/${selectedItemId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete item');
+      }
+      
+      console.log(`✅ Item deleted: ${selectedItemId}`);
+      
+      // Update state - remove deleted item
+      setItems((prev) => prev.filter((item) => item.id !== selectedItemId));
+      setNodes((nds) => nds.filter((node) => node.id !== selectedItemId));
+      setSelectedItemId(null);
+      
+      // Show success result
+      setIsDeleting(false);
+      setDeleteResult({
+        success: true,
+        deletedCount: 1,
+        remainingCount: items.length - 1
+      });
+      setShowResultModal(true);
+      
+    } catch (error) {
+      console.error('❌ Error deleting item:', error);
+      setIsDeleting(false);
+      setDeleteResult({
+        success: false,
+        deletedCount: 0,
+        error: 'Failed to delete item. Check console for details.'
+      });
+      setShowResultModal(true);
+    }
+  }, [API_BASE_URL, selectedItemId, items]);
+
   // Reset board function
   const handleResetBoard = useCallback(async () => {
     try {
@@ -1804,7 +1999,7 @@ function Canvas2() {
       setShowResetModal(false);
       setIsDeleting(true);
       
-      // Filter items to delete (exclude 'raw' and 'single-encounter' items)
+      // Filter items to delete (exclude 'raw' and 'single-encounter' items, but include images)
       const itemsToDelete = items.filter((item: any) => {
         const id = item.id || '';
         if (id.includes('raw') || id.includes('single-encounter')) {
@@ -1893,7 +2088,68 @@ function Canvas2() {
         if (reloadResponse.ok) {
           const reloadResult = await reloadResponse.json();
           console.log(`✅ Board items reloaded from static file: ${reloadResult.itemCount} items`);
-          console.log('🔃 All connected clients will refresh automatically via SSE');
+          
+          // Immediately fetch the reloaded items to update local state
+          console.log('🔄 Fetching reloaded items...');
+          const fetchResponse = await fetch(`${API_BASE_URL}/api/board-items`);
+          if (fetchResponse.ok) {
+            const reloadedItems = await fetchResponse.json();
+            console.log(`✅ Fetched ${reloadedItems.length} reloaded items`);
+            
+            // Update local state with reloaded items
+            setItems(reloadedItems);
+            
+            // Update nodes with reloaded positions
+            const itemNodes: Node[] = reloadedItems.map((item: any) => {
+              let nodeType = 'boardItem';
+              if (item.type === 'triageFlow') {
+                nodeType = 'triageFlow';
+              } else if (item.type === 'ehrHub') {
+                nodeType = 'ehrHub';
+              } else if (item.type === 'zone') {
+                nodeType = 'zone';
+              } else if (item.componentType === 'SingleEncounterDocument') {
+                nodeType = 'singleEncounter';
+              }
+              
+              const isRawDataDocument = item.id?.includes('raw-') || item.componentType === 'RawClinicalNote' || item.componentType === 'ICELabData';
+              const isSubzone = item.id?.includes('subzone-') || item.type === 'zone';
+              
+              const nodeData = (item.type === 'triageFlow' || item.type === 'ehrHub')
+                ? item.data 
+                : item.type === 'zone'
+                ? { ...item.data, zone: { width: item.width, height: item.height, label: item.data?.label }, style: item.style }
+                : { 
+                    item: item,
+                    isSelected: false,
+                    onUpdate: handleUpdateItem,
+                    onDelete: handleDeleteItem,
+                    onSelect: handleSelectItem,
+                  };
+              
+              return {
+                id: item.id,
+                type: nodeType,
+                position: { x: item.x, y: item.y },
+                data: nodeData,
+                draggable: item.draggable !== false && !isSubzone,
+                selectable: item.selectable !== false && item.type !== 'triageFlow' && item.componentType !== 'SingleEncounterDocument' && !isSubzone,
+                zIndex: isSubzone ? -2 : (isRawDataDocument ? 10 : (nodeType === 'singleEncounter' ? 2 : 1)),
+                style: item.style,
+              };
+            });
+            
+            // Update nodes while keeping zones and consolidators
+            setNodes((prevNodes) => {
+              const zoneNodes = prevNodes.filter(n => n.type === 'zone');
+              const consolidatorNodes = prevNodes.filter(n => n.id.includes('consolidator') || n.id.includes('data-consolidator'));
+              return [...zoneNodes, ...consolidatorNodes, ...itemNodes];
+            });
+            
+            console.log('✅ Local state updated with reloaded items');
+          } else {
+            console.warn('⚠️ Failed to fetch reloaded items');
+          }
         } else {
           console.warn('⚠️ Failed to reload board items from static file');
         }
@@ -1938,18 +2194,9 @@ function Canvas2() {
         if (response.success !== undefined) {
           if (response.success) {
             console.log('✅ Chat history cleared successfully');
-            setAlertModal({
-              isOpen: true,
-              message: 'Chat history cleared successfully!',
-              type: 'success'
-            });
           } else {
             console.error('❌ Failed to clear chats:', response.error);
-            setAlertModal({
-              isOpen: true,
-              message: `Failed to clear chat history: ${response.error || 'Unknown error'}`,
-              type: 'error'
-            });
+           
           }
         }
       }
@@ -2230,35 +2477,124 @@ function Canvas2() {
 
         {/* Reset Button */}
         <button
-          onClick={() => setShowResetModal(true)}
+          onClick={() => {
+            // Check if selected item is a static item
+            if (selectedItemId) {
+              const selectedItem = items.find((item: any) => item.id === selectedItemId);
+              if (selectedItem) {
+                const id = selectedItem.id || '';
+                const isStaticItem = id.includes('raw') || id.includes('single-encounter') || 
+                                    (!id.startsWith('enhanced') && !id.startsWith('item') && 
+                                     !id.startsWith('doctor-note') && !id.startsWith('image-'));
+                if (isStaticItem) {
+                  // Don't open modal for static items
+                  return;
+                }
+              }
+            }
+            setShowResetModal(true);
+          }}
+          disabled={(() => {
+            if (!selectedItemId) return false;
+            const selectedItem = items.find((item: any) => item.id === selectedItemId);
+            if (!selectedItem) return false;
+            const id = selectedItem.id || '';
+            return id.includes('raw') || id.includes('single-encounter') || 
+                   (!id.startsWith('enhanced') && !id.startsWith('item') && 
+                    !id.startsWith('doctor-note') && !id.startsWith('image-'));
+          })()}
           style={{
             width: '52px',
             height: '52px',
             border: '2px solid rgba(2, 136, 209, 0.15)',
             borderRadius: '14px',
-            background: 'white',
-            color: '#0288d1',
-            cursor: 'pointer',
+            background: (() => {
+              if (!selectedItemId) return 'white';
+              const selectedItem = items.find((item: any) => item.id === selectedItemId);
+              if (!selectedItem) return 'white';
+              const id = selectedItem.id || '';
+              const isStaticItem = id.includes('raw') || id.includes('single-encounter') || 
+                                  (!id.startsWith('enhanced') && !id.startsWith('item') && 
+                                   !id.startsWith('doctor-note') && !id.startsWith('image-'));
+              return isStaticItem ? '#f5f5f5' : 'white';
+            })(),
+            color: (() => {
+              if (!selectedItemId) return '#0288d1';
+              const selectedItem = items.find((item: any) => item.id === selectedItemId);
+              if (!selectedItem) return '#0288d1';
+              const id = selectedItem.id || '';
+              const isStaticItem = id.includes('raw') || id.includes('single-encounter') || 
+                                  (!id.startsWith('enhanced') && !id.startsWith('item') && 
+                                   !id.startsWith('doctor-note') && !id.startsWith('image-'));
+              return isStaticItem ? '#9e9e9e' : '#0288d1';
+            })(),
+            cursor: (() => {
+              if (!selectedItemId) return 'pointer';
+              const selectedItem = items.find((item: any) => item.id === selectedItemId);
+              if (!selectedItem) return 'pointer';
+              const id = selectedItem.id || '';
+              const isStaticItem = id.includes('raw') || id.includes('single-encounter') || 
+                                  (!id.startsWith('enhanced') && !id.startsWith('item') && 
+                                   !id.startsWith('doctor-note') && !id.startsWith('image-'));
+              return isStaticItem ? 'not-allowed' : 'pointer';
+            })(),
             boxShadow: '0 4px 16px rgba(2, 136, 209, 0.12)',
             transition: 'all 0.2s ease',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            opacity: (() => {
+              if (!selectedItemId) return 1;
+              const selectedItem = items.find((item: any) => item.id === selectedItemId);
+              if (!selectedItem) return 1;
+              const id = selectedItem.id || '';
+              const isStaticItem = id.includes('raw') || id.includes('single-encounter') || 
+                                  (!id.startsWith('enhanced') && !id.startsWith('item') && 
+                                   !id.startsWith('doctor-note') && !id.startsWith('image-'));
+              return isStaticItem ? 0.5 : 1;
+            })(),
           }}
-          title="Reset Board (Delete All API Items)"
+          title={(() => {
+            if (!selectedItemId) return "Reset Board (Delete All API Items)";
+            const selectedItem = items.find((item: any) => item.id === selectedItemId);
+            if (!selectedItem) return "Reset Board (Delete All API Items)";
+            const id = selectedItem.id || '';
+            const isStaticItem = id.includes('raw') || id.includes('single-encounter') || 
+                                (!id.startsWith('enhanced') && !id.startsWith('item') && 
+                                 !id.startsWith('doctor-note') && !id.startsWith('image-'));
+            return isStaticItem ? "Static item selected - Deselect to reset entire board or select another item to delete" : "Delete Selected Item";
+          })()}
           onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-3px) scale(1.05)';
-            e.currentTarget.style.boxShadow = '0 6px 20px rgba(239, 68, 68, 0.3)';
-            e.currentTarget.style.background = '#ef4444';
-            e.currentTarget.style.color = 'white';
-            e.currentTarget.style.borderColor = '#ef4444';
+            if (!selectedItemId || !(() => {
+              const selectedItem = items.find((item: any) => item.id === selectedItemId);
+              if (!selectedItem) return false;
+              const id = selectedItem.id || '';
+              return id.includes('raw') || id.includes('single-encounter') || 
+                     (!id.startsWith('enhanced') && !id.startsWith('item') && 
+                      !id.startsWith('doctor-note') && !id.startsWith('image-'));
+            })()) {
+              e.currentTarget.style.transform = 'translateY(-3px) scale(1.05)';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(239, 68, 68, 0.3)';
+              e.currentTarget.style.background = '#ef4444';
+              e.currentTarget.style.color = 'white';
+              e.currentTarget.style.borderColor = '#ef4444';
+            }
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0) scale(1)';
-            e.currentTarget.style.boxShadow = '0 4px 16px rgba(2, 136, 209, 0.12)';
-            e.currentTarget.style.background = 'white';
-            e.currentTarget.style.color = '#0288d1';
-            e.currentTarget.style.borderColor = 'rgba(2, 136, 209, 0.15)';
+            if (!selectedItemId || !(() => {
+              const selectedItem = items.find((item: any) => item.id === selectedItemId);
+              if (!selectedItem) return false;
+              const id = selectedItem.id || '';
+              return id.includes('raw') || id.includes('single-encounter') || 
+                     (!id.startsWith('enhanced') && !id.startsWith('item') && 
+                      !id.startsWith('doctor-note') && !id.startsWith('image-'));
+            })()) {
+              e.currentTarget.style.transform = 'translateY(0) scale(1)';
+              e.currentTarget.style.boxShadow = '0 4px 16px rgba(2, 136, 209, 0.12)';
+              e.currentTarget.style.background = 'white';
+              e.currentTarget.style.color = '#0288d1';
+              e.currentTarget.style.borderColor = 'rgba(2, 136, 209, 0.15)';
+            }
           }}
         >
           <X size={22} />
@@ -2349,73 +2685,139 @@ function Canvas2() {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 style={{ margin: '0 0 16px 0', fontSize: '24px', fontWeight: 600, color: '#dc2626', display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span>⚠️</span> Reset Board to Default
-            </h2>
-            
-            <p style={{ margin: '0 0 12px 0', fontSize: '16px', lineHeight: 1.6, color: '#374151' }}>
-              This will <strong>reset the board to its default state</strong>.
-            </p>
-            
-            <div style={{ background: '#fef2f2', border: '2px solid #fecaca', borderRadius: '8px', padding: '16px', margin: '16px 0' }}>
-              <p style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#991b1b' }}>
-                What will happen:
-              </p>
-              <ul style={{ margin: '0', paddingLeft: '20px', color: '#991b1b', fontSize: '14px', lineHeight: 1.8 }}>
-                <li>Delete dynamic items (todos, notes, images, agent results)</li>
-                <li>Reset ALL item positions to default</li>
-                <li>Clear Chat conversation history</li>
-              </ul>
-            </div>
-            
-            <p style={{ margin: '12px 0', fontSize: '16px', fontWeight: 600, color: '#374151' }}>
-              Items that will remain:
-            </p>
-            <ul style={{ margin: '12px 0', paddingLeft: '24px', color: '#374151' }}>
-              <li style={{ margin: '6px 0', fontSize: '15px' }}>Raw EHR Data (at default positions)</li>
-              <li style={{ margin: '6px 0', fontSize: '15px' }}>Single Encounter Data (at default positions)</li>
-            </ul>
-            
-            <div style={{ background: '#fef2f2', border: '2px solid #fecaca', borderRadius: '8px', padding: '16px', margin: '20px 0', color: '#991b1b', fontWeight: 500, fontSize: '15px' }}>
-              ⚠️ This action CANNOT be undone!
-            </div>
-            
-            <div style={{ display: 'flex', gap: '12px', marginTop: '24px', justifyContent: 'flex-end' }}>
-              <button
-                onClick={() => setShowResetModal(false)}
-                style={{
-                  padding: '12px 24px',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  background: '#f3f4f6',
-                  color: '#374151',
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleResetBoard}
-                disabled={isDeleting}
-                style={{
-                  padding: '12px 24px',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  cursor: isDeleting ? 'not-allowed' : 'pointer',
-                  background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
-                  color: 'white',
-                  opacity: isDeleting ? 0.6 : 1,
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                {isDeleting ? 'Deleting...' : 'Delete All Items'}
-              </button>
-            </div>
+            {selectedItemId ? (
+              // Delete selected item mode
+              <>
+                <h2 style={{ margin: '0 0 16px 0', fontSize: '24px', fontWeight: 600, color: '#dc2626', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span>⚠️</span> Delete Selected Item
+                </h2>
+                
+                <p style={{ margin: '0 0 12px 0', fontSize: '16px', lineHeight: 1.6, color: '#374151' }}>
+                  This will <strong>delete the currently selected item</strong>.
+                </p>
+                
+                <div style={{ background: '#fef2f2', border: '2px solid #fecaca', borderRadius: '8px', padding: '16px', margin: '16px 0' }}>
+                  <p style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#991b1b' }}>
+                    Item to be deleted:
+                  </p>
+                  <p style={{ margin: '0', paddingLeft: '8px', color: '#991b1b', fontSize: '14px', fontFamily: 'monospace' }}>
+                    {selectedItemId}
+                  </p>
+                </div>
+                
+                <div style={{ background: '#fef2f2', border: '2px solid #fecaca', borderRadius: '8px', padding: '16px', margin: '20px 0', color: '#991b1b', fontWeight: 500, fontSize: '15px' }}>
+                  ⚠️ This action CANNOT be undone!
+                </div>
+                
+                <div style={{ display: 'flex', gap: '12px', marginTop: '24px', justifyContent: 'flex-end' }}>
+                  <button
+                    onClick={() => setShowResetModal(false)}
+                    style={{
+                      padding: '12px 24px',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      background: '#f3f4f6',
+                      color: '#374151',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleDeleteSelectedItem}
+                    disabled={isDeleting}
+                    style={{
+                      padding: '12px 24px',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      cursor: isDeleting ? 'not-allowed' : 'pointer',
+                      background: isDeleting ? '#fca5a5' : '#dc2626',
+                      color: 'white',
+                      transition: 'all 0.2s ease',
+                      opacity: isDeleting ? 0.6 : 1,
+                    }}
+                  >
+                    {isDeleting ? 'Deleting...' : 'Delete Item'}
+                  </button>
+                </div>
+              </>
+            ) : (
+              // Reset board mode
+              <>
+                <h2 style={{ margin: '0 0 16px 0', fontSize: '24px', fontWeight: 600, color: '#dc2626', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span>⚠️</span> Reset Board to Default
+                </h2>
+                
+                <p style={{ margin: '0 0 12px 0', fontSize: '16px', lineHeight: 1.6, color: '#374151' }}>
+                  This will <strong>reset the board to its default state</strong>.
+                </p>
+                
+                <div style={{ background: '#fef2f2', border: '2px solid #fecaca', borderRadius: '8px', padding: '16px', margin: '16px 0' }}>
+                  <p style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#991b1b' }}>
+                    What will happen:
+                  </p>
+                  <ul style={{ margin: '0', paddingLeft: '20px', color: '#991b1b', fontSize: '14px', lineHeight: 1.8 }}>
+                    <li>Delete dynamic items (todos, notes, images, agent results)</li>
+                    <li>Reset ALL item positions to default</li>
+                    <li>Clear Chat conversation history</li>
+                  </ul>
+                </div>
+                
+                <p style={{ margin: '12px 0', fontSize: '16px', fontWeight: 600, color: '#374151' }}>
+                  Items that will remain:
+                </p>
+                <ul style={{ margin: '12px 0', paddingLeft: '24px', color: '#374151' }}>
+                  <li style={{ margin: '6px 0', fontSize: '15px' }}>Raw EHR Data (at default positions)</li>
+                  <li style={{ margin: '6px 0', fontSize: '15px' }}>Single Encounter Data (at default positions)</li>
+                </ul>
+                
+                <div style={{ background: '#fef2f2', border: '2px solid #fecaca', borderRadius: '8px', padding: '16px', margin: '20px 0', color: '#991b1b', fontWeight: 500, fontSize: '15px' }}>
+                  ⚠️ This action CANNOT be undone!
+                </div>
+                
+                <div style={{ display: 'flex', gap: '12px', marginTop: '24px', justifyContent: 'flex-end' }}>
+                  <button
+                    onClick={() => setShowResetModal(false)}
+                    style={{
+                      padding: '12px 24px',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      background: '#f3f4f6',
+                      color: '#374151',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleResetBoard}
+                    disabled={isDeleting}
+                    style={{
+                      padding: '12px 24px',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      cursor: isDeleting ? 'not-allowed' : 'pointer',
+                      background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+                      color: 'white',
+                      opacity: isDeleting ? 0.6 : 1,
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    {isDeleting ? 'Resetting...' : 'Reset Board'}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -2465,10 +2867,7 @@ function Canvas2() {
                     No dynamic items to delete.
                   </p>
                 )}
-                <div style={{ background: '#f0fdf4', border: '2px solid #86efac', borderRadius: '8px', padding: '12px', margin: '12px 0', color: '#166534' }}>
-                  <p style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600 }}>✅ Board Reset Complete:</p>
-                 
-                </div>
+              
                 {deleteResult.remainingCount !== undefined && (
                   <p style={{ margin: '0 0 12px 0', fontSize: '16px', lineHeight: 1.6, color: '#374151' }}>
                     <strong>{deleteResult.remainingCount}</strong> items remaining on the board.

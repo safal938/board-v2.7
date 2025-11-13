@@ -625,18 +625,10 @@ const findPositionInZone = (newItem, existingItems, zoneConfig) => {
 
 // Doctor's Notes Zone boundaries
 const DOCTORS_NOTE_ZONE = {
-  x: 5800,
-  y: 0,
+  x: 2600,
+  y: 11400,
   width: 2000,
   height: 2100,
-};
-
-// Raw EHR Data Zone boundaries
-const RAW_EHR_DATA_ZONE = {
-  x: 1500,
-  y: -3800,
-  width: 2500,
-  height: 2400,
 };
 
 // Find position within Doctor's Notes Zone with proper spacing
@@ -1935,8 +1927,8 @@ app.post("/api/doctor-notes", async (req, res) => {
     const noteId = `doctor-note-${Date.now()}`;
 
     // Determine position - use provided or default to Doctor's Note Zone
-    const noteX = x !== undefined ? x : 4300;
-    const noteY = y !== undefined ? y : -2200;
+    const noteX = x !== undefined ? x : 2600;
+    const noteY = y !== undefined ? y : 11400;
     const noteWidth = width || 450;
     const noteHeight = height || 600;
 
@@ -1945,7 +1937,7 @@ app.post("/api/doctor-notes", async (req, res) => {
       id: noteId,
       type: "doctor-note",
       x: noteX,
-      y: noteY,
+      y: noteY+20,
       width: noteWidth,
       height: noteHeight,
       noteData: {
@@ -2651,8 +2643,8 @@ app.post("/api/dili-diagnostic", async (req, res) => {
     // Zone configuration mapping (matches src/data/zone-config.json)
     const zoneConfig = {
       "adv-event-zone": { x: -1250, y: 3500, width: 4000, height: 2300 },
-      "dili-analysis-zone": { x: -625, y: 7000, width: 2750, height: 2800 },
-      "patient-report-zone": { x: -625, y: 10700, width: 2750, height: 2800 },
+      "dili-analysis-zone": { x: -140, y: 7000, width: 2750, height: 2800 },
+      "patient-report-zone": { x: -140, y: 10700, width: 2750, height: 2800 },
       "raw-ehr-data-zone": { x: 1500, y: -3800, width: 2500, height: 2400 },
       "data-zone": { x: -1500, y: 500, width: 4500, height: 1500 },
       "retrieved-data-zone": { x: 5800, y: -4600, width: 2000, height: 2100 },
@@ -2751,8 +2743,8 @@ app.post("/api/patient-report", async (req, res) => {
     // Zone configuration mapping (matches src/data/zone-config.json)
     const zoneConfig = {
       "adv-event-zone": { x: -1250, y: 3500, width: 4000, height: 2300 },
-      "dili-analysis-zone": { x: -625, y: 7000, width: 2750, height: 2800 },
-      "patient-report-zone": { x: -625, y: 10700, width: 2750, height: 2800 },
+      "dili-analysis-zone": { x: -140, y: 7000, width: 2750, height: 2800 },
+      "patient-report-zone": { x: -140, y: 11400, width: 2750, height: 2800 },
       "raw-ehr-data-zone": { x: 1500, y: -3800, width: 2500, height: 2400 },
       "data-zone": { x: -1500, y: 500, width: 4500, height: 1500 },
       "retrieved-data-zone": { x: 5800, y: -4600, width: 2000, height: 2100 },
