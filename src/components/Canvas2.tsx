@@ -1155,6 +1155,34 @@ function Canvas2() {
             animated: true,
             style: { stroke: '#2196F3', strokeWidth: 6 },
           },
+          // Patient Report Zone → Push to EHR Button
+          {
+            id: 'edge-patient-report-to-push-ehr',
+            source: 'zone-patient-report-zone',
+            sourceHandle: 'bottom',
+            target: 'dashboard-item-push-to-ehr-new',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#2196F3', strokeWidth: 6 },
+          },
+          // Push to EHR Button → Accept Button
+          {
+            id: 'edge-push-ehr-to-accept',
+            source: 'dashboard-item-push-to-ehr-new',
+            target: 'dashboard-item-accept-button',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#4CAF50', strokeWidth: 6 },
+          },
+          // Push to EHR Button → Reject Button
+          {
+            id: 'edge-push-ehr-to-reject',
+            source: 'dashboard-item-push-to-ehr-new',
+            target: 'dashboard-item-reject-button',
+            type: 'default',
+            animated: true,
+            style: { stroke: '#F44336', strokeWidth: 6 },
+          },
           // Raw EHR Data → Task Management Zone (direct connection with curved bezier)
           {
             id: 'edge-raw-ehr-to-task-zone',

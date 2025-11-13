@@ -37,7 +37,7 @@
       "gradient": "linear-gradient(135deg, rgba(227, 242, 253, 0.6) 0%, rgba(225, 245, 254, 0.6) 100%)",
       "borderGradient": "linear-gradient(135deg, #1E88E5 0%, #2196F3 100%)",
       "description": "Patient report generation and documentation",
-      "handlePosition": "top"
+      "handlePosition": "both"
     },
     {
       "name": "raw-ehr-data-zone",
@@ -108,7 +108,7 @@
       "name": "easl-chatbot-zone",
       "label": "Guideline Assistant Zone",
       "x": 8000,
-      "y": 500,
+      "y": 690,
       "width": 2000,
       "height": 1400,
       "color": "#FF6B6B",
