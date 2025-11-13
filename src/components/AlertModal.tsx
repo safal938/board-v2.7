@@ -2,14 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertCircle, CheckCircle, XCircle, X } from 'lucide-react';
+import { AlertCircle, CheckCircle, XCircle, X, Loader2 } from 'lucide-react';
 
 interface AlertModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
   message: string;
-  type?: 'success' | 'error' | 'warning' | 'info';
+  type?: 'success' | 'error' | 'warning' | 'info' | 'loading';
 }
 
 const ModalOverlay = styled(motion.div)`
@@ -50,9 +50,23 @@ const ModalHeader = styled.div<{ type: string }>`
         case 'success': return '#10b981';
         case 'error': return '#ef4444';
         case 'warning': return '#f59e0b';
+        case 'loading': return '#3b82f6';
         default: return '#3b82f6';
       }
     }};
+  }
+  
+  .spinner {
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -135,6 +149,8 @@ const AlertModal: React.FC<AlertModalProps> = ({
         return <XCircle />;
       case 'warning':
         return <AlertCircle />;
+      case 'loading':
+        return <Loader2 className="spinner" />;
       default:
         return <AlertCircle />;
     }
@@ -150,6 +166,8 @@ const AlertModal: React.FC<AlertModalProps> = ({
         return 'Error';
       case 'warning':
         return 'Warning';
+      case 'loading':
+        return 'Processing';
       default:
         return 'Information';
     }
@@ -162,7 +180,7 @@ const AlertModal: React.FC<AlertModalProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={onClose}
+          onClick={type === 'loading' ? undefined : onClose}
         >
           <ModalContent
             initial={{ scale: 0.9, opacity: 0 }}
@@ -170,9 +188,11 @@ const AlertModal: React.FC<AlertModalProps> = ({
             exit={{ scale: 0.9, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
           >
-            <CloseButton onClick={onClose}>
-              <X />
-            </CloseButton>
+            {type !== 'loading' && (
+              <CloseButton onClick={onClose}>
+                <X />
+              </CloseButton>
+            )}
             
             <ModalHeader type={type}>
               {getIcon()}
@@ -181,9 +201,11 @@ const AlertModal: React.FC<AlertModalProps> = ({
             
             <ModalMessage>{message}</ModalMessage>
             
-            <ModalButton onClick={onClose}>
-              OK
-            </ModalButton>
+            {type !== 'loading' && (
+              <ModalButton onClick={onClose}>
+                OK
+              </ModalButton>
+            )}
           </ModalContent>
         </ModalOverlay>
       )}
