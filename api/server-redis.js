@@ -1253,20 +1253,17 @@ app.post("/api/agents", async (req, res) => {
       });
     }
 
-    // Zone configuration mapping
+    // Zone configuration mapping (matches src/data/zone-config.json)
     const zoneConfig = {
-      "task-management-zone": { x: -250, y: -2300, width: 2000, height: 2100 },
-      "retrieved-data-zone": { x: -250, y: -4600, width: 2000, height: 2100 },
-      "doctors-note-zone": { x: -250, y: 0, width: 2000, height: 2100 },
       "adv-event-zone": { x: -1250, y: 3500, width: 4000, height: 2300 },
-      "data-zone": { x: -1500, y: 500, width: 4500, height: 1500 },
-      "raw-ehr-data-zone": { x: -2500, y: -5600, width: 6500, height: 4200 },
       "dili-analysis-zone": { x: -625, y: 7000, width: 2750, height: 2800 },
-      "share-hepatologist-zone": { x: -625, y: 10000, width: 2750, height: 500 },
       "patient-report-zone": { x: -625, y: 10700, width: 2750, height: 2800 },
-      "push-to-ehr-zone": { x: -625, y: 13700, width: 2750, height: 500 },
-      "patient-action-zone": { x: -625, y: 14400, width: 2750, height: 1200 },
-      "web-interface-zone": { x: -2200, y: 0, width: 2000, height: 1500 },
+      "raw-ehr-data-zone": { x: 1500, y: -3800, width: 2500, height: 2400 },
+      "data-zone": { x: -1500, y: 500, width: 4500, height: 1500 },
+      "retrieved-data-zone": { x: 5800, y: -4600, width: 2000, height: 2100 },
+      "doctors-note-zone": { x: 5800, y: 0, width: 2000, height: 2100 },
+      "task-management-zone": { x: 5800, y: -2300, width: 2000, height: 2100 },
+      "easl-chatbot-zone": { x: 5800, y: 2300, width: 2000, height: 1400 },
     };
 
     // Calculate dynamic height based on content
@@ -2651,20 +2648,17 @@ app.post("/api/dili-diagnostic", async (req, res) => {
       });
     }
 
-    // Zone configuration mapping
+    // Zone configuration mapping (matches src/data/zone-config.json)
     const zoneConfig = {
-      "task-management-zone": { x: -250, y: -2300, width: 2000, height: 2100 },
-      "retrieved-data-zone": { x: -250, y: -4600, width: 2000, height: 2100 },
-      "doctors-note-zone": { x: -250, y: 0, width: 2000, height: 2100 },
       "adv-event-zone": { x: -1250, y: 3500, width: 4000, height: 2300 },
-      "data-zone": { x: -1500, y: 500, width: 4500, height: 1500 },
-      "raw-ehr-data-zone": { x: -2500, y: -5600, width: 6500, height: 4200 },
       "dili-analysis-zone": { x: -625, y: 7000, width: 2750, height: 2800 },
-      "share-hepatologist-zone": { x: -625, y: 10000, width: 2750, height: 500 },
       "patient-report-zone": { x: -625, y: 10700, width: 2750, height: 2800 },
-      "push-to-ehr-zone": { x: -625, y: 13700, width: 2750, height: 500 },
-      "patient-action-zone": { x: -625, y: 14400, width: 2750, height: 1200 },
-      "web-interface-zone": { x: -2200, y: 0, width: 2000, height: 1500 },
+      "raw-ehr-data-zone": { x: 1500, y: -3800, width: 2500, height: 2400 },
+      "data-zone": { x: -1500, y: 500, width: 4500, height: 1500 },
+      "retrieved-data-zone": { x: 5800, y: -4600, width: 2000, height: 2100 },
+      "doctors-note-zone": { x: 5800, y: 0, width: 2000, height: 2100 },
+      "task-management-zone": { x: 5800, y: -2300, width: 2000, height: 2100 },
+      "easl-chatbot-zone": { x: 5800, y: 2300, width: 2000, height: 1400 },
     };
 
     // Build item
@@ -2727,7 +2721,7 @@ app.post("/api/dili-diagnostic", async (req, res) => {
       item: newItem,
       timestamp: new Date().toISOString(),
       action: "created",
-      zone: zone || "task-management-zone",
+      zone: zone || "dili-analysis-zone",
     };
     broadcastSSE(payload);
 
@@ -2754,20 +2748,17 @@ app.post("/api/patient-report", async (req, res) => {
       });
     }
 
-    // Zone configuration mapping
+    // Zone configuration mapping (matches src/data/zone-config.json)
     const zoneConfig = {
-      "task-management-zone": { x: -250, y: -2300, width: 2000, height: 2100 },
-      "retrieved-data-zone": { x: -250, y: -4600, width: 2000, height: 2100 },
-      "doctors-note-zone": { x: -250, y: 0, width: 2000, height: 2100 },
       "adv-event-zone": { x: -1250, y: 3500, width: 4000, height: 2300 },
-      "data-zone": { x: -1500, y: 500, width: 4500, height: 1500 },
-      "raw-ehr-data-zone": { x: -2500, y: -5600, width: 6500, height: 4200 },
       "dili-analysis-zone": { x: -625, y: 7000, width: 2750, height: 2800 },
-      "share-hepatologist-zone": { x: -625, y: 10000, width: 2750, height: 500 },
       "patient-report-zone": { x: -625, y: 10700, width: 2750, height: 2800 },
-      "push-to-ehr-zone": { x: -625, y: 13700, width: 2750, height: 500 },
-      "patient-action-zone": { x: -625, y: 14400, width: 2750, height: 1200 },
-      "web-interface-zone": { x: -2200, y: 0, width: 2000, height: 1500 },
+      "raw-ehr-data-zone": { x: 1500, y: -3800, width: 2500, height: 2400 },
+      "data-zone": { x: -1500, y: 500, width: 4500, height: 1500 },
+      "retrieved-data-zone": { x: 5800, y: -4600, width: 2000, height: 2100 },
+      "doctors-note-zone": { x: 5800, y: 0, width: 2000, height: 2100 },
+      "task-management-zone": { x: 5800, y: -2300, width: 2000, height: 2100 },
+      "easl-chatbot-zone": { x: 5800, y: 2300, width: 2000, height: 1400 },
     };
 
     // Build item
@@ -2829,7 +2820,7 @@ app.post("/api/patient-report", async (req, res) => {
       item: newItem,
       timestamp: new Date().toISOString(),
       action: "created",
-      zone: zone || "task-management-zone",
+      zone: zone || "patient-report-zone",
     };
     broadcastSSE(payload);
 

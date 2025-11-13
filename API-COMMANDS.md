@@ -674,7 +674,7 @@ curl -X POST http://localhost:3001/api/patient-report \
         "Monitor liver function"
       ]
     },
-    "zone": "doctors-note-zone"
+    "zone": "patient-report-zone"
   }' | jq
 ```
 

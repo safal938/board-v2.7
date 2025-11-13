@@ -350,32 +350,65 @@ const DocTableCell = styled.div<{ header?: boolean }>`
 `;
 
 interface PatientReportProps {
-  patientData: {
-    name: string;
-    date_of_birth: string;
-    age: number;
-    sex: string;
-    mrn: string;
-    primaryDiagnosis: string;
-    problem_list: Array<{ name: string; status: string }>;
-    allergies: string[];
-    medication_history: Array<{ name: string; dose: string }>;
-    acute_event_summary: string;
-    diagnosis_acute_event: string[];
-    causality: string;
-    management_recommendations: string[];
+  patientData?: {
+    name?: string;
+    date_of_birth?: string;
+    age?: number;
+    sex?: string;
+    mrn?: string;
+    primaryDiagnosis?: string;
+    problem_list?: Array<{ name: string; status: string }>;
+    allergies?: string[];
+    medication_history?: Array<{ name: string; dose: string }>;
+    acute_event_summary?: string;
+    diagnosis_acute_event?: string[];
+    causality?: string;
+    management_recommendations?: string[];
   };
   onUpdate?: (updatedData: any) => void;
 }
 
 const PatientReport: React.FC<PatientReportProps> = ({ patientData, onUpdate }) => {
   const [isEditMode, setIsEditMode] = useState(false);
-  const [editableData, setEditableData] = useState(patientData);
+  
+  // Initialize with safe defaults
+  const safePatientData = {
+    name: patientData?.name || '',
+    date_of_birth: patientData?.date_of_birth || '',
+    age: patientData?.age || 0,
+    sex: patientData?.sex || '',
+    mrn: patientData?.mrn || '',
+    primaryDiagnosis: patientData?.primaryDiagnosis || '',
+    problem_list: patientData?.problem_list || [],
+    allergies: patientData?.allergies || [],
+    medication_history: patientData?.medication_history || [],
+    acute_event_summary: patientData?.acute_event_summary || '',
+    diagnosis_acute_event: patientData?.diagnosis_acute_event || [],
+    causality: patientData?.causality || '',
+    management_recommendations: patientData?.management_recommendations || []
+  };
+  
+  const [editableData, setEditableData] = useState(safePatientData);
   const documentRef = useRef<HTMLDivElement>(null);
 
   // Update editableData when patientData prop changes
   useEffect(() => {
-    setEditableData(patientData);
+    const updatedData = {
+      name: patientData?.name || '',
+      date_of_birth: patientData?.date_of_birth || '',
+      age: patientData?.age || 0,
+      sex: patientData?.sex || '',
+      mrn: patientData?.mrn || '',
+      primaryDiagnosis: patientData?.primaryDiagnosis || '',
+      problem_list: patientData?.problem_list || [],
+      allergies: patientData?.allergies || [],
+      medication_history: patientData?.medication_history || [],
+      acute_event_summary: patientData?.acute_event_summary || '',
+      diagnosis_acute_event: patientData?.diagnosis_acute_event || [],
+      causality: patientData?.causality || '',
+      management_recommendations: patientData?.management_recommendations || []
+    };
+    setEditableData(updatedData);
   }, [patientData]);
 
   const handleSave = () => {
@@ -390,7 +423,23 @@ const PatientReport: React.FC<PatientReportProps> = ({ patientData, onUpdate }) 
   };
 
   const handleCancel = () => {
-    setEditableData(patientData); // Reset to original
+    // Reset to original with safe defaults
+    const resetData = {
+      name: patientData?.name || '',
+      date_of_birth: patientData?.date_of_birth || '',
+      age: patientData?.age || 0,
+      sex: patientData?.sex || '',
+      mrn: patientData?.mrn || '',
+      primaryDiagnosis: patientData?.primaryDiagnosis || '',
+      problem_list: patientData?.problem_list || [],
+      allergies: patientData?.allergies || [],
+      medication_history: patientData?.medication_history || [],
+      acute_event_summary: patientData?.acute_event_summary || '',
+      diagnosis_acute_event: patientData?.diagnosis_acute_event || [],
+      causality: patientData?.causality || '',
+      management_recommendations: patientData?.management_recommendations || []
+    };
+    setEditableData(resetData);
     setIsEditMode(false);
   };
 
@@ -923,11 +972,11 @@ const PatientReport: React.FC<PatientReportProps> = ({ patientData, onUpdate }) 
               Patient Demographics
             </ViewSectionTitle>
             <ViewText>
-              <strong>Name:</strong> {patientData.name}<br/>
-              <strong>DOB:</strong> {patientData.date_of_birth}<br/>
-              <strong>Age:</strong> {patientData.age} years<br/>
-              <strong>Sex:</strong> {patientData.sex}<br/>
-              <strong>MRN:</strong> {patientData.mrn}
+              <strong>Name:</strong> {editableData.name}<br/>
+              <strong>DOB:</strong> {editableData.date_of_birth}<br/>
+              <strong>Age:</strong> {editableData.age} years<br/>
+              <strong>Sex:</strong> {editableData.sex}<br/>
+              <strong>MRN:</strong> {editableData.mrn}
             </ViewText>
           </ViewSection>
 
@@ -936,7 +985,7 @@ const PatientReport: React.FC<PatientReportProps> = ({ patientData, onUpdate }) 
               <Stethoscope />
               Clinical Information
             </ViewSectionTitle>
-            <ViewText><strong>Primary Diagnosis:</strong> {patientData.primaryDiagnosis}</ViewText>
+            <ViewText><strong>Primary Diagnosis:</strong> {editableData.primaryDiagnosis}</ViewText>
           </ViewSection>
 
           <ViewSection>
@@ -945,7 +994,7 @@ const PatientReport: React.FC<PatientReportProps> = ({ patientData, onUpdate }) 
               Problem List
             </ViewSectionTitle>
             <ViewList>
-              {patientData.problem_list.map((problem, index) => (
+              {editableData.problem_list.map((problem, index) => (
                 <ViewListItem key={index}>{problem.name} ({problem.status})</ViewListItem>
               ))}
             </ViewList>
@@ -957,7 +1006,7 @@ const PatientReport: React.FC<PatientReportProps> = ({ patientData, onUpdate }) 
               Allergies
             </ViewSectionTitle>
             <ViewList>
-              {patientData.allergies.map((allergy, index) => (
+              {editableData.allergies.map((allergy, index) => (
                 <ViewListItem key={index}>{allergy}</ViewListItem>
               ))}
             </ViewList>
@@ -969,7 +1018,7 @@ const PatientReport: React.FC<PatientReportProps> = ({ patientData, onUpdate }) 
               Medication History
             </ViewSectionTitle>
             <ViewList>
-              {patientData.medication_history.map((med, index) => (
+              {editableData.medication_history.map((med, index) => (
                 <ViewListItem key={index}>{med.name} - {med.dose}</ViewListItem>
               ))}
             </ViewList>
@@ -980,7 +1029,7 @@ const PatientReport: React.FC<PatientReportProps> = ({ patientData, onUpdate }) 
               <Activity />
               Acute Event Summary
             </ViewSectionTitle>
-            <ViewText>{patientData.acute_event_summary}</ViewText>
+            <ViewText>{editableData.acute_event_summary}</ViewText>
           </ViewSection>
         </LeftColumn>
 
@@ -992,7 +1041,7 @@ const PatientReport: React.FC<PatientReportProps> = ({ patientData, onUpdate }) 
               Diagnosis - Acute Event
             </ViewSectionTitle>
             <ViewList>
-              {patientData.diagnosis_acute_event.map((diagnosis, index) => (
+              {editableData.diagnosis_acute_event.map((diagnosis, index) => (
                 <ViewListItem key={index}>{diagnosis}</ViewListItem>
               ))}
             </ViewList>
@@ -1003,7 +1052,7 @@ const PatientReport: React.FC<PatientReportProps> = ({ patientData, onUpdate }) 
               <TrendingUp />
               Causality Analysis
             </ViewSectionTitle>
-            <ViewText>{patientData.causality}</ViewText>
+            <ViewText>{editableData.causality}</ViewText>
           </ViewSection>
 
           <ViewSection>
@@ -1012,7 +1061,7 @@ const PatientReport: React.FC<PatientReportProps> = ({ patientData, onUpdate }) 
               Management Recommendations
             </ViewSectionTitle>
             <ViewList>
-              {patientData.management_recommendations.map((rec, index) => (
+              {editableData.management_recommendations.map((rec, index) => (
                 <ViewListItem key={index}>{rec}</ViewListItem>
               ))}
             </ViewList>
