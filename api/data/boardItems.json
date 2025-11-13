@@ -1980,8 +1980,8 @@
   {
     "id": "iframe-item-easl-interface",
     "type": "iframe",
-    "x": 8100,
-    "y": 800,
+    "x": 5900,
+    "y": 2400,
     "width": 1800,
     "height": 1200,
     "title": "EASL Web Interface",
