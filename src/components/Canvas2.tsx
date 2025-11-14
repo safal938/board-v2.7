@@ -2180,7 +2180,7 @@ function Canvas2() {
 
   // Listen for responses from EASL iframe
   useEffect(() => {
-    const handleEASLResponse = (event: MessageEvent) => {
+    const handleEASLResponse = async (event: MessageEvent) => {
       // Security check
       if (event.origin !== 'https://easl-board.vercel.app') {
         return;
@@ -2200,6 +2200,35 @@ function Canvas2() {
           }
         }
       }
+
+      // Handle conversation messages from EASL iframe
+      if (event.data?.type === 'EASL_CONVERSATION') {
+        const { query, response, timestamp, metadata } = event.data.payload;
+        console.log('📥 Received conversation from EASL:', { query, response });
+        
+        try {
+          // Save conversation to backend
+          const saveResponse = await fetch(`${API_BASE_URL}/api/easl-response`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              query,
+              response,
+              metadata: metadata || {},
+              response_type: 'chat'
+            })
+          });
+
+          if (saveResponse.ok) {
+            const result = await saveResponse.json();
+            console.log('✅ Conversation saved:', result);
+          } else {
+            console.error('❌ Failed to save conversation:', await saveResponse.text());
+          }
+        } catch (error) {
+          console.error('❌ Error saving conversation:', error);
+        }
+      }
     };
 
     window.addEventListener('message', handleEASLResponse);
@@ -2207,7 +2236,7 @@ function Canvas2() {
     return () => {
       window.removeEventListener('message', handleEASLResponse);
     };
-  }, []);
+  }, [API_BASE_URL]);
 
   // Update nodes when selection changes
   useEffect(() => {

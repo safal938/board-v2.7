@@ -2156,10 +2156,11 @@ app.post("/api/easl-response", async (req, res) => {
   const { response_type, query, response, metadata } = req.body;
 
   try {
-    // Only process complete responses
-    if (response_type !== 'complete') {
+    // Only process complete responses (accept both 'complete' and 'chat')
+    const validTypes = ['complete', 'chat'];
+    if (!validTypes.includes(response_type)) {
       return res.status(400).json({
-        error: "Only complete responses are accepted",
+        error: "Only complete responses are accepted (valid types: 'complete', 'chat')",
         received_type: response_type
       });
     }

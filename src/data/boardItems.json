@@ -1993,6 +1993,21 @@
     "updatedAt": "2025-10-28T12:00:00.000Z"
   },
   {
+    "id": "easl-clear-chats-button",
+    "type": "button",
+    "x": 4300,
+    "y": 7050,
+    "width": 200,
+    "height": 45,
+    "buttonText": "Clear Chats",
+    "buttonIcon": "",
+    "buttonColor": "#ffffff",
+    "buttonTextColor": "#000000",
+    "buttonAction": "clearChats",
+    "createdAt": "2025-11-14T12:00:00.000Z",
+    "updatedAt": "2025-11-14T12:00:00.000Z"
+  },
+  {
     "id": "ehr-hub-nervecentre",
     "type": "ehrHub",
     "x": -700,

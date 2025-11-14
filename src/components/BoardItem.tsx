@@ -1193,7 +1193,7 @@ const BoardItem = ({ item, isSelected, onUpdate, onDelete, onSelect, zoom = 1 })
                 border: "none",
                 borderRadius: "8px",
                 background: isProcessing ? "#9ca3af" : (item.buttonColor || "#dc2626"),
-                color: "white",
+                color: item.buttonTextColor || "white",
                 fontSize: "20px",
                 fontWeight: "600",
                 cursor: isProcessing ? "not-allowed" : "pointer",
