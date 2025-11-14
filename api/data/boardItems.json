@@ -1988,9 +1988,11 @@
     "iframeUrl": "https://easl-board.vercel.app/",
     "color": "#ffffff",
     "rotation": 0,
-    "conversationHistory": [],
+    "conversationHistory": [
+
+    ],
     "createdAt": "2025-10-28T12:00:00.000Z",
-    "updatedAt": "2025-10-28T12:00:00.000Z"
+    "updatedAt": "2025-11-14T04:41:43.828Z"
   },
   {
     "id": "ehr-hub-nervecentre",
